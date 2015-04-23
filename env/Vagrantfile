@@ -1,0 +1,66 @@
+BUILD_IMAGE = true          # build docker image from Dockerfile
+PROVISION_DOCKER = true     # install docker daemon on virtual machine
+REMOVE_CONTAINER = true     # kill and remove the solr-container so it can be restarted
+CLEAN_DATABASE = true    # erase all the data from the database
+RUN_CONTAINER = true     # run the solr-container
+
+
+
+Vagrant.configure("2") do |config|
+
+	if REMOVE_CONTAINER
+		config.vm.provision "shell", path: "./scripts/cleandocker.sh"
+	end
+
+	if CLEAN_DATABASE
+		config.vm.provision "shell", path: "./scripts/clean_database.sh"
+	end
+
+	config.vm.provision "docker" do |d|
+		# d.build_image "/app/env/database"
+
+
+		if BUILD_IMAGE
+			#d.pull_images "mysql:latest"
+			d.build_image "/app/env/server",
+			args: "-t vcaen/lyon-tour-server"
+
+			d.build_image "/app/env/database",
+			args: "-t vcaen/lyon-tour-database"
+		end
+	end
+
+	config.vm.provision "docker", run: "always" do |d|
+		if RUN_CONTAINER
+			#d.run "mysql:latest",
+			#args: "--name lyon-tour-mysql \
+			#-e MYSQL_ROOT_PASSWORD=#{MYSQL_ROOT_PASSWORD}\
+			#-e MYSQL_DATABASE=#{MYSQL_DATABASE} \
+			#-e MYSQL_USER=#{MYSQL_USER} \
+			#-v /app/env/database:/var/lib/mysql \
+			#-d \
+			#-p 3306:3306"
+			d.run "vcaen/lyon-tour-database",
+			args: " --name lyon-tour-database \
+			-v /app/env/local/database:/var/lib/mysql \
+			-d \
+			-p 3306:3306"
+
+			d.run "vcaen/lyon-tour-server",
+			args: "-v '/app/src:/app' -p 8000:8000 --link lyon-tour-database:webdb"
+		end
+
+	end
+
+	config.vm.provider "virtualbox" do |v|
+		v.memory = 1024
+		v.cpus = 2
+	end
+	config.vm.box = "ubuntu/trusty64"
+	config.vm.synced_folder ".", "/app/env"
+	config.vm.synced_folder "../src", "/app/src"
+
+	config.vm.network "forwarded_port", guest: 8000, host: 8000
+	config.vm.network "forwarded_port", guest: 3306, host: 3306
+
+end
