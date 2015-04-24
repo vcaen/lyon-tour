@@ -59,12 +59,12 @@ Du coup pour relancer l'application on peut utiliser PyCharm :
   4. Mettez le nom que vous voulez en haut
   5. Dans Script mettez ```\app\src\server.py```
   6. Dans Script parameters : ```debug```
-  7. Dans Python interpreter, mettez l'interpreteur qu'on a configurer avant.
+  7. Dans Python interpreter, mettez l'interpreteur qu'on a configuré avant.
   8. Cochez en haut : Single Instance Only
  
 Vous pouvez maintenant lancer le serveur en cliquant sur la flèche verte et acceder à (http://127.0.0.1:8081)
 
-## Liens utils
+## Liens utiles
 
   *[Tuto Flask](http://flask.pocoo.org/docs/0.10/quickstart/)
   *[Tuto API Rest](https://flask-restful.readthedocs.org/en/0.3.2/quickstart.html)
