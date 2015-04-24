@@ -1,3 +1,5 @@
+flask
 Flask-SQLAlchemy
 MySQL-python
-flask
+sqlalchemy-migrate
+flask-restful

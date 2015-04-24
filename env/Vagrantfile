@@ -16,6 +16,7 @@ Vagrant.configure("2") do |config|
 		config.vm.provision "shell", path: "./scripts/clean_database.sh"
 	end
 
+	# Building the images
 	config.vm.provision "docker" do |d|
 		# d.build_image "/app/env/database"
 
@@ -30,6 +31,7 @@ Vagrant.configure("2") do |config|
 		end
 	end
 
+	# Running the images
 	config.vm.provision "docker", run: "always" do |d|
 		if RUN_CONTAINER
 			#d.run "mysql:latest",
@@ -47,20 +49,25 @@ Vagrant.configure("2") do |config|
 			-p 3306:3306"
 
 			d.run "vcaen/lyon-tour-server",
-			args: "-v '/app/src:/app' -p 8000:8000 --link lyon-tour-database:webdb"
+			args: "-v '/app/src:/app' --restart=on-failure -p 8888:8000 --link lyon-tour-database:webdb"
 		end
 
 	end
+
+	config.vm.provision "shell", run: "always", path: "./scripts/startup.sh"
+	config.vm.provision "shell", path: "./scripts/provision.sh"
 
 	config.vm.provider "virtualbox" do |v|
 		v.memory = 1024
 		v.cpus = 2
 	end
 	config.vm.box = "ubuntu/trusty64"
-	config.vm.synced_folder ".", "/app/env"
-	config.vm.synced_folder "../src", "/app/src"
+	config.vm.synced_folder "..", "/app"
+	
 
+	config.vm.network "forwarded_port", guest: 8888, host: 8888
 	config.vm.network "forwarded_port", guest: 8000, host: 8000
+	config.vm.network "forwarded_port", guest: 8081, host: 8081
 	config.vm.network "forwarded_port", guest: 3306, host: 3306
 
 end

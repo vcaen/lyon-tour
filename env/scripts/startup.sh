@@ -1,0 +1,1 @@
+(python /app/src/server.py 2>&1 | awk '{ print strftime("%c: "), $0; fflush(); }' | tee /app/env/local/logs/server.txt ) > /dev/null &

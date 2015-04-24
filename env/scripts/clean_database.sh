@@ -1,2 +1,2 @@
 echo "Delete local database's data..."
-rm -r /app/env/local/*
+rm -rf /app/env/local/database/*
