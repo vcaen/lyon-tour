@@ -64,10 +64,10 @@ Du coup pour relancer l'application on peut utiliser PyCharm :
  
 Vous pouvez maintenant lancer le serveur en cliquant sur la flèche verte et acceder à (http://127.0.0.1:8081)
 
-## Liens utiles
+## Liens utils
 
-[Tuto Flask](http://flask.pocoo.org/docs/0.10/quickstart/)
-[Tuto API Rest](https://flask-restful.readthedocs.org/en/0.3.2/quickstart.html)
+  *[Tuto Flask](http://flask.pocoo.org/docs/0.10/quickstart/)
+  *[Tuto API Rest](https://flask-restful.readthedocs.org/en/0.3.2/quickstart.html)
 
 
 
