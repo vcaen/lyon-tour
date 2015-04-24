@@ -9,6 +9,15 @@ Le repo est divisé en deux répertoires : ```src/``` et ```env/```.
 ```env/``` contient l'environnement de développement. 
 C'est ici que le serveur tourne. Normalement il n'y a pas de modifications à faire là
 
+Tout tourne sur 127.0.0.1.
+
+*Explication rapide de différents ports :*
+  * 8000 : Serveur de dev/test qui tourne sur directement sur la VM
+  * 8081 : Même chose mais quand on lance l'appli avec ```debug``` comme argument
+  * 8888 : Serveur sur un container Docker dans la VM. Si ca tourne la, ca tournera sur le serveur distant.
+  * 3306 : base de données mysql.
+
+
 ## Prérequis
 
 ### Obligatoire 
