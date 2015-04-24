@@ -43,7 +43,17 @@ PyCharm est maintenant configuré pour utiliser le python de la VM. (Vous pouvez
 Pour le moment, si il y a une erreur dans le programme, python crash dans la VM mais ne redémarre pas.
 Les logs sont disponibles dans ```env/local/logs/server.log```
 
-Du coup pour relancer l'application on peut utiliser PyCharm.
+Du coup pour relancer l'application on peut utiliser PyCharm : 
+  1. En haut à droite, à gauche de la flèche verte, cliquez sur le menu déroulant.
+  2. Cliquez sur ```Edit configurations```
+  3. Cliquez sur "+", puis "Python"
+  4. Mettez le nom que vous voulez en haut
+  5. Dans Script mettez ```\app\src\server.py```
+  6. Dans Script parameters : ```debug```
+  7. Dans Python interpreter, mettez l'interpreteur qu'on a configurer avant.
+  8. Cochez en haut : Single Instance Only
+ 
+Vous pouvez maintenant lancer le serveur en cliquant sur la flèche verte et acceder à (http://127.0.0.1:8081)
 
 
 
