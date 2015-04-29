@@ -1,4 +1,5 @@
 from sqlalchemy import Enum
+from models import Attraction
 
 
 __author__ = 'vcaen'
@@ -14,24 +15,24 @@ class TypePI(Enum):
 class Tour:
 
     def __init__(self, dateDeb, dateFin):
-        self.m_DateDebut = datetime.datetime.strptime(dateDeb, '%d/%m/%Y %H:%M')
-        self.m_DateFin = datetime.datetime.strptime(dateFin, '%d/%m/%Y %H:%M')
-        self.m_nbJour = (self.m_DateFin - self.m_DateDebut).days + 1
+        self.DateDebut = datetime.datetime.strptime(dateDeb, '%d/%m/%Y %H:%M')
+        self.DateFin = datetime.datetime.strptime(dateFin, '%d/%m/%Y %H:%M')
+        self.nbJour = (self.DateFin - self.DateDebut).days + 1
 
-        self.jours = []
-        for i in range(0,self.m_nbJour,1):
-            self.jours.append(Jour(datetime.timedelta(i)))
+        response = JSONObject()
+        response.DateDebut = str(self.DateDebut)
+        response.DateFin = str(self.DateFin)
+        response.nbJour = str(self.nbJour)
 
-            response = JSONObject()
-            response.DateDebut = str(self.m_DateDebut)
-            response.DateFin = str(self.m_DateFin)
-            response.nbJour = str(self.m_nbJour)
-            response.Jours = []
-            response.PI = []
+        response.PI = []
+        response.Jours = []
+        for i in range(0,self.nbJour,1):
+            Temp = (self.DateDebut + datetime.timedelta(days = i))
+            response.Jours.append(Jour(str(Temp)))
 
-            response.PI.append(PointDInteret('Beaux Arts',TypePI.MUSEE))
-            response.PI.append(PointDInteret("Tete d'Or",TypePI.PARC))
-            response.PI.append(PointDInteret("Café Mokxa",TypePI.CAFE))
+        response.PI.append(Attraction('Beaux Arts',TypePI.MUSEE, "descrition","Adresse" ))
+        response.PI.append(Attraction("Tete d'Or",TypePI.PARC, "descrition","Adresse"))
+        response.PI.append(Attraction("Cafe Mokxa",TypePI.CAFE, "descrition","Adresse"))
 
         self.response = response
 
@@ -39,15 +40,8 @@ class Tour:
         return str(self.response.to_JSON())
 
 class Jour:
-
     def __init__(self, date):
-        self.m_date = date
-
-class PointDInteret:
-    def __init__(self, nom, type):
-        self.m_nom = nom
-        self.m_type = type
-
+        self.date = date
 
 class JSONObject:
     def to_JSON(self):
