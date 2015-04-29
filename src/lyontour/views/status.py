@@ -1,7 +1,7 @@
 __author__ = 'vcaen'
 from lyontour import api, app
 from flask.ext.restful import Resource
-from lyontour.model.models import Jour,Tour
+from lyontour.model.tour_manager import Jour,Tour
 from flask import Flask, request
 
 todos = {}
