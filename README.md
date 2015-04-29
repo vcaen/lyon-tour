@@ -66,8 +66,9 @@ Vous pouvez maintenant lancer le serveur en cliquant sur la flèche verte et acc
 
 ## Liens utiles
 
-  *[Tuto Flask](http://flask.pocoo.org/docs/0.10/quickstart/)
-  *[Tuto API Rest](https://flask-restful.readthedocs.org/en/0.3.2/quickstart.html)
+ * [Tuto Flask](http://flask.pocoo.org/docs/0.10/quickstart/)
+ * [Tuto API Restful](https://flask-restful.readthedocs.org/en/0.3.2/quickstart.html)
+ * [Tuto API RESTless](https://flask-restless.readthedocs.org/en/latest/index.html)
 
 
 
