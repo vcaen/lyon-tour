@@ -8,6 +8,6 @@ todos = {}
 print("status")
 
 
-@app.route('/Tour', methods=['GET'])
+@app.route('/Tour', methods=['POST'])
 def Test():
     return (Tour(request.form['DateDebut'], request.form['DateFin'])).toString()
