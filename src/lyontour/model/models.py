@@ -1,7 +1,6 @@
 
 from lyontour import db
 
-
 class Type(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), primary_key=True)
@@ -30,7 +29,6 @@ class Attraction():
         self.description = desc
         self.type = untype
         self.address = adress
-
 
 
 

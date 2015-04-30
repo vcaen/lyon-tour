@@ -10,4 +10,6 @@ print("status")
 
 @app.route('/Tour', methods=['POST'])
 def Test():
-    return (Tour(request.form['DateDebut'], request.form['DateFin'])).toString()
+    list = str(request.form['filtre']).split(',')
+
+    return (Tour(request.form['datedebut'], request.form['datefin'], list)).toString()
