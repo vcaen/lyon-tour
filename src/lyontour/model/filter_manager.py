@@ -18,41 +18,41 @@ class filter_manager:
 
     def getRainByDay(self, jour):
         date_jour = datetime.datetime.strptime(jour, '%Y-%m-%d').date()
-        to_day = datetime.datetime.now().date()
-        if date_jour < to_day:
-            return "erreur, date passée \n"
-        else:
+        # to_day = datetime.datetime.now().date()
+        # if date_jour < to_day:
+        #     return "erreur, date passée \n"
+        #else:
             #rain = WeatherDay.query.filter_by(date=jour).first().rain
-            day = WeatherDay.query.get(jour)
-            if not(day is None):
-                pluie = day.rain
-                return pluie <= 2.5
-            else:
-                f = urllib2.urlopen(meteo_api_url)
-                json_string = f.read()
-                parsed_json = json.loads(json_string)
-                f.close()
-                rain = parsed_json[jour + ' 12:00:00']["pluie"]
-                return rain >= 2.5
+        day = WeatherDay.query.get(jour)
+        if not(day is None):
+            pluie = day.rain
+            return pluie <= 2.5
+        else:
+            f = urllib2.urlopen(meteo_api_url)
+            json_string = f.read()
+            parsed_json = json.loads(json_string)
+            f.close()
+            rain = parsed_json[jour + ' 12:00:00']["pluie"]
+            return rain >= 2.5
 
     def getSnowByDay(self, jour):
         date_jour = datetime.datetime.strptime(jour, '%Y-%m-%d').date()
-        to_day = datetime.datetime.now().date()
-        if date_jour < to_day:
-            return "erreur, date passée \n"
-        else:
+        # to_day = datetime.datetime.now().date()
+        # if date_jour < to_day:
+        #     return "erreur, date passée \n"
+        # else:
             #snow = WeatherDay.query.filter_by(date=jour).first().snow
-            day = WeatherDay.query.get(jour)
-            if not(day is None):
-                neige = day.snow
-                return neige
-            else:
-                f = urllib2.urlopen(meteo_api_url)
-                json_string = f.read()
-                parsed_json = json.loads(json_string)
-                f.close()
-                snow = parsed_json[jour + ' 12:00:00']["risque_neige"]
-                return snow
+        day = WeatherDay.query.get(jour)
+        if not(day is None):
+            neige = day.snow
+            return neige
+        else:
+            f = urllib2.urlopen(meteo_api_url)
+            json_string = f.read()
+            parsed_json = json.loads(json_string)
+            f.close()
+            snow = parsed_json[jour + ' 12:00:00']["risque_neige"]
+            return snow
 
     def filtre_meteo(self, jour, preference):
         for i in preference:
