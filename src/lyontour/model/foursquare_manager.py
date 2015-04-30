@@ -17,7 +17,7 @@ url = 'https://api.foursquare.com/v2/venues/explore?'
 params= {'client_id': client_id, 'client_secret': client_secret, 'near': near, 'v': version}
 
 
-def executeRequests(limit, *listSection):
+def executeRequests(limit, listSection):
     listAttraction = []
     params['limit'] = limit
     for section in listSection:
@@ -33,12 +33,18 @@ def executeRequests(limit, *listSection):
                     description = ''
                 else:
                     description = val2['venue']['description']
-                adresse = val2['venue']['location']['address']
+                if 'address' not in val2['venue']['location']:
+                    adresse = ''
+                else:
+                    adresse = val2['venue']['location']['address']
                 latitude = val2['venue']['location']['lat']
                 longitude = val2['venue']['location']['lng']
                 codePostal = val2['venue']['location']['postalCode']
                 ville = val2['venue']['location']['city']
-                telephone = val2['venue']['contact']['phone']
+                if 'phone' not in val2['venue']['contact']:
+                    telephone = ' '
+                else:
+                    telephone = val2['venue']['contact']['phone']
 
                 attraction = models.Attraction(nom, section, description, adresse)
                 # attraction.address = adresse
@@ -53,13 +59,18 @@ def executeRequests(limit, *listSection):
                 # attraction.type = type
 
                 listAttraction.append(attraction)
-
-    for attraction in listAttraction:
-        print attraction.name
+                
     return listAttraction
 
 section = models.Section()
 section.name = 'coffee'
 section.id = 1
 db.session.add(section)
-executeRequests(5, section)
+section2 = models.Section()
+section2.name = 'arts'
+section2.id = 2
+db.session.add(section2)
+listSection = []
+listSection.append(section)
+listSection.append(section2)
+executeRequests(5, listSection)
