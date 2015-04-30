@@ -1,4 +1,4 @@
-BUILD_IMAGE = false          # build docker image from Dockerfile
+BUILD_IMAGE = true          # build docker image from Dockerfile
 PROVISION_DOCKER = true     # install docker daemon on virtual machine
 REMOVE_CONTAINER = true     # kill and remove the solr-container so it can be restarted
 CLEAN_DATABASE = true    # erase all the data from the database
