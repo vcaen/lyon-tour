@@ -33,6 +33,7 @@ class filter_manager:
             parsed_json = json.loads(json_string)
             f.close()
             rain = parsed_json[jour + ' 12:00:00']["pluie"]
+            # TODO: Add to the date base in WeakDay
             return rain >= 2.5
 
     def getSnowByDay(self, jour):
@@ -52,6 +53,7 @@ class filter_manager:
             parsed_json = json.loads(json_string)
             f.close()
             snow = parsed_json[jour + ' 12:00:00']["risque_neige"]
+            # TODO: Add to the date base in WeakDay
             return snow
 
     def filtre_meteo(self, jour, preference):
