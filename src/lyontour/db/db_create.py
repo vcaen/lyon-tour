@@ -3,7 +3,7 @@
 
 from lyontour import db
 import os.path
-from lyontour.model.models import Type
+from lyontour.model.models import Section
 
 print "Creating Database..."
 db.drop_all()
