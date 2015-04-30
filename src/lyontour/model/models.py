@@ -34,7 +34,6 @@ class Attraction(db.Model):
 
 
 
-
 class WeatherDay(db.Model):
     date = db.Column(db.Date, primary_key=True)
     rain = db.Column(db.Float, nullable=True)
