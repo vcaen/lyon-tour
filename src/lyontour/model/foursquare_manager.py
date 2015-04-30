@@ -47,30 +47,22 @@ def executeRequests(limit, listSection):
                     telephone = val2['venue']['contact']['phone']
 
                 attraction = models.Attraction(nom, section, description, adresse)
-                # attraction.address = adresse
-                # #attraction.description = description
-                # attraction.foursquare_id = id
-                # attraction.hours = 'NULL'
-                # attraction.latitude = latitude
-                # attraction.longitude = longitude
-                # attraction.name = nom
-                # attraction.photo = 'NULL'
-                # attraction.postcode = codePostal
-                # attraction.type = type
+                attraction.address = adresse
+                attraction.description = description
+                attraction.foursquare_id = id
+                attraction.hours = 'NULL'
+                attraction.latitude = latitude
+                attraction.longitude = longitude
+                attraction.name = nom
+                attraction.photo = 'NULL'
+                attraction.postcode = codePostal
+                attraction.type = type
 
                 listAttraction.append(attraction)
+
+
+
                 
     return listAttraction
 
-section = models.Section()
-section.name = 'coffee'
-section.id = 1
-db.session.add(section)
-section2 = models.Section()
-section2.name = 'arts'
-section2.id = 2
-db.session.add(section2)
-listSection = []
-listSection.append(section)
-listSection.append(section2)
-executeRequests(5, listSection)
+

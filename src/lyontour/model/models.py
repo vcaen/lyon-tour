@@ -1,4 +1,4 @@
-
+from _mysql import result
 from lyontour import db
 
 
@@ -31,8 +31,6 @@ class Attraction(db.Model):
         self.description = desc
         self.section_id = untype
         self.address = adress
-
-
 
 class WeatherDay(db.Model):
     date = db.Column(db.Date, primary_key=True)
