@@ -1,13 +1,30 @@
 #!/usr/bin/python
 #  -*- coding: utf-8 -*-
-from migrate.versioning import api
-from config import SQLALCHEMY_DATABASE_URI
-from config import SQLALCHEMY_MIGRATE_REPO
-from mouvinsa.models import db
+
+from lyontour import db
+from lyontour.model.models import Section
 import os.path
+
+print "Creating Database..."
+db.drop_all()
 db.create_all()
-if not os.path.exists(SQLALCHEMY_MIGRATE_REPO):
-    api.create(SQLALCHEMY_MIGRATE_REPO, 'database repository')
-    api.version_control(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO)
-else:
-    api.version_control(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO, api.version(SQLALCHEMY_MIGRATE_REPO))
+print "Database created"
+
+print "Filling Section table .."
+food = Section("food", "whatever", "whatever", 2)
+drinks = Section("drinks", "whatever", "evening/night", 3)
+coffee = Section("coffee", "whatever", "evening/night", 2)
+shops = Section("shops", "bad", "morning/evening", 4)
+arts = Section("arts", "bad", "evening", 2)
+outdoors = Section("outdoors", "good", "day", 3)
+sights = Section("sights", "good", "day", 3)
+
+db.session.add(food)
+db.session.add(drinks)
+db.session.add(coffee)
+db.session.add(shops)
+db.session.add(arts)
+db.session.add(outdoors)
+db.session.add(sights)
+db.session.commit()
+print "Section table Filled "
