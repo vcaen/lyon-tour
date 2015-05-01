@@ -1,4 +1,4 @@
-from lyontour.model.models import Attraction, Type
+from lyontour.model.models import Attraction
 
 __author__ = 'vcaen'
 

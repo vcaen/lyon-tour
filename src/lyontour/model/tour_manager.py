@@ -1,5 +1,6 @@
 from sqlalchemy import Enum
-from models import Attraction
+from models import Attraction, Section
+from foursquare_manager import executeRequests
 
 
 __author__ = 'vcaen'
@@ -15,18 +16,37 @@ class Tour:
         dateFin = datetime.datetime.strptime(fin, '%d%m%Y')
         self.DateFin = str(dateFin.date())
         self.nbJour = str((dateFin - dateDebut).days + 1)
-        self.PI = []
-        self.PI.append(Attraction('Beaux Arts',"Musee", "descrition","Adresse"))
-        self.PI.append(Attraction("Tete d'Or","PARC", "descrition","Adresse"))
-        self.PI.append(Attraction("Cafe Mokxa","CAFE", "descrition","Adresse"))
+        # self.PI.append(Attraction('Beaux Arts',"Musee", "descrition","Adresse"))
+        # self.PI.append(Attraction("Tete d'Or","PARC", "descrition","Adresse"))
+        # self.PI.append(Attraction("Cafe Mokxa","CAFE", "descrition","Adresse"))
         self.Filtre = list
+
+        listSection = []
+        for s in list:
+            section = Section()
+            section.name = s
+            listSection.append(section)
+
+        self.PI = executeRequests(self.nbJour, listSection)
 
 
 
     def toString(self):
         response = JSONObject()
-        response.tour = self.__dict__
-        return str(response.to_JSON())
+        response.dateDebut = self.DateDebut
+        response.dateFin = self.DateFin
+        response.filtre = self.Filtre
+        response.PI = []
+        for a in self.PI:
+            item = JSONObject()
+            item.nom = a.name
+            item.description = a.description
+            item.adresse = a.address
+            item.codePostal = a.postcode
+            item.id = a.id
+            response.PI.append(item)
+
+        return str(response.toJson())
 
 class Itineraire:
     def __init__(self):
@@ -40,9 +60,11 @@ class Jour:
         self.date = date
 
 class JSONObject:
-    def to_JSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__,
-            sort_keys=True, indent=4, separators=(',', ': '))
+    def toJson(self):
+        return json.dumps(self, default=lambda o: o.__dict__,sort_keys=True, indent=4, separators=(',', ': '))
+
+
+
 
 
 
