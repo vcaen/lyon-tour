@@ -3,3 +3,4 @@ Flask-SQLAlchemy
 MySQL-python
 sqlalchemy-migrate
 flask-restful
+requests
