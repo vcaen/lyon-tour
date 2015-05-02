@@ -1,7 +1,7 @@
 # coding=utf-8
 import os
 import shutil
-from lyontour.model.models import Attraction
+from lyontour.model.models import Attraction, Section
 
 __author__ = 'Sonia'
 
@@ -58,14 +58,15 @@ class FoursquareManager:
 
     def get_venues(self, limit, sections=None):
         if sections is None or len(sections) == 0 :
-            listSection = models.Section.query.all()
+            resp = Section.query.all()
+            listSection = [ x.name for x in resp ]
         else:
             listSection = sections
         listAttraction = set()
         params['limit'] = limit
 
         for section in listSection:
-            params['section'] = section.name
+            params['section'] = section
             response = requests.get(url, params=params)
             # print response.url
             data = json.loads(response.text)
@@ -108,14 +109,27 @@ class FoursquareManager:
 
 
 def executeRequests(limit, listSection=None):
-    foursquare_manager = FoursquareManager()
-    attractions = foursquare_manager.get_venues(limit, listSection)
-    db.session.add_all(attractions)
-    db.session.commit()
-    return attractions
+
+    if not listSection:
+        attractions_count = Attraction.query.limit(limit).count()
+    else:
+        attractions_count = Attraction.query.join(Section).filter(Section.name.in_(listSection)).count()
+
+
+
+    if attractions_count < limit :
+        foursquare_manager = FoursquareManager()
+        attractions = foursquare_manager.get_venues(limit, listSection)
+        db.session.add_all(attractions)
+        db.session.commit()
+
+    if not listSection:
+        return Attraction.query.limit(limit).all()
+    else:
+        return Attraction.query.join(Section).filter(Section.name.in_(listSection)).all()
 
 
 if __name__=='__main__':
-    executeRequests(3)
+    executeRequests(10)
 
 

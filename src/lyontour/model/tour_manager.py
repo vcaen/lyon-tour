@@ -20,9 +20,6 @@ class Tour:
         # self.PI.append(Attraction("Tete d'Or","PARC", "descrition","Adresse"))
         # self.PI.append(Attraction("Cafe Mokxa","CAFE", "descrition","Adresse"))
         self.Filtre = list
-
-
-
         self.PI = executeRequests(self.nbJour, list)
 
 

@@ -18,12 +18,16 @@ class SectionSchema(ModelSchema):
         sqla_session = session
 
 class TourSchema(ModelSchema):
+    count = fields.Method('get_PI_count')
     DateDebut = fields.Str()
     DateFin = fields.Str()
     PI = fields.List(fields.Nested(AttractionSchema))
 
-    class Meta:
-        fields = ('DateDebut', 'DateFin', 'PI')
+    def get_PI_count(self, obj):
+        return len(obj.PI)
+
+    # class Meta:
+    #     fields = ('DateDebut', 'DateFin', 'PI')
 
 attraction_schema = AttractionSchema()
 section_schema = SectionSchema()
