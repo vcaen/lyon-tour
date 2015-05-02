@@ -1,7 +1,9 @@
 # coding=utf-8
+
 __author__ = 'Sonia'
 
 import requests
+import urllib
 import json
 from lyontour.model import models
 from lyontour import db
@@ -22,6 +24,7 @@ def executeRequests(limit, listSection):
     for section in listSection:
         params['section'] = section.name
         response = requests.get(url, params=params)
+        # print response.url
         data = json.loads(response.text)
         for val in data["response"]["groups"]:
             for val2 in val['items']:
@@ -31,9 +34,7 @@ def executeRequests(limit, listSection):
                     description = ''
                 else:
                     description = val2['venue']['description']
-
                 if 'location' in val2['venue'] :
-
                     if 'address' not in val2['venue']['location']:
                         adresse = ''
                     else:
@@ -64,27 +65,34 @@ def executeRequests(limit, listSection):
                 else:
                     telephone = val2['venue']['contact']['phone']
 
+                for tips in val2['tips']:
+                    if 'photourl' in tips:
+                        photoId = tips['photo']['id']
+                        photoUrl = tips['photourl']
+                        photoUrl.replace('\\', '')
+                        photoName = "lyontour/images/" + photoId + ".jpg"
+                        urllib.urlretrieve(photoUrl, photoName.encode('ascii', 'ignore'))
+                        break
+
                 attraction = models.Attraction(nom, section, description, adresse)
                 attraction.foursquare_id = id
-                # attraction.hours = 'NULL'
                 attraction.latitude = latitude
                 attraction.longitude = longitude
-                # attraction.photo = 'NULL'
+                attraction.photo = photoId
                 attraction.postcode = codePostal
                 listAttraction.append(attraction)
                 db.session.add(attraction)
-    for attract in listAttraction:
-        print attract.name
+
+    # for attract in listAttraction:
+    #     print attract.name
     return listAttraction
 
-section = models.Section()
-section.name = 'coffee'
+section = models.Section('coffee', 'NULL', 'NULL', 'NULL')
 db.session.add(section)
-section2 = models.Section()
-section2.name = 'arts'
+section2 = models.Section('arts', 'NULL', 'NULL', 'NULL')
 db.session.add(section2)
 listSection = []
 listSection.append(section)
-listSection.append(section2)
+#listSection.append(section2)
 executeRequests(5, listSection)
 
