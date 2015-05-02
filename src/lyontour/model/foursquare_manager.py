@@ -78,7 +78,7 @@ def executeRequests(limit, listSection=None):
                 attraction.longitude = longitude
                 # attraction.photo = 'NULL'
                 attraction.postcode = codePostal
-                listAttraction.append(attraction)
+                listAttraction.add(attraction)
                 db.session.add(attraction)
     for attract in listAttraction:
         print attract.name

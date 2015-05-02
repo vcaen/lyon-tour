@@ -13,3 +13,4 @@ app.config.from_object(config)
 
 from lyontour.views import status
 from lyontour.model import models
+from lyontour.views import ressources
