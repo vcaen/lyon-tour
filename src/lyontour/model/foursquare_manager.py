@@ -3,13 +3,14 @@ __author__ = 'Sonia'
 
 import requests
 import requests_cache
+import urllib
 import json
 from lyontour.model import models
 from lyontour import db
 
 
 requests_cache.install_cache(expire_after=3600)
-import foursquare
+
 
 #from models import Type
 
@@ -28,66 +29,59 @@ def executeRequests(limit, listSection=None):
     params['limit'] = limit
     for section in listSection:
         params['section'] = section.name
-
-    response = requests.get(url, params=params)
-    data = json.loads(response.text)
-    for val in data["response"]["groups"]:
-        for val2 in val['items']:
-            id = val2['venue']['id']
-            nom = val2['venue']['name']
-            if 'description' not in val2['venue']:
-                description = ''
-            else:
-                description = val2['venue']['description']
-
-            if 'location' in val2['venue'] :
-
-                if 'address' not in val2['venue']['location']:
-                    adresse = ''
+        response = requests.get(url, params=params)
+        # print response.url
+        data = json.loads(response.text)
+        for val in data["response"]["groups"]:
+            for val2 in val['items']:
+                id = val2['venue']['id']
+                nom = val2['venue']['name']
+                if 'description' not in val2['venue']:
+                    description = ''
                 else:
-                    adresse = val2['venue']['location']['address']
+                    description = val2['venue']['description']
+                if 'location' in val2['venue'] :
+                    if 'address' not in val2['venue']['location']:
+                        adresse = ''
+                    else:
+                        adresse = val2['venue']['location']['address']
 
-                if 'lat' not in val2['venue']['location']:
-                    latitude = ''
+                    if 'lat' not in val2['venue']['location']:
+                        latitude = ''
+                    else:
+                        latitude = val2['venue']['location']['lat']
+
+                    if 'lng' not in val2['venue']['location']:
+                        longitude = ''
+                    else:
+                        longitude = val2['venue']['location']['lng']
+
+                    if 'postalCode' not in val2['venue']['location']:
+                        codePostal = ''
+                    else:
+                        codePostal = val2['venue']['location']['postalCode']
+
+                    if 'city' not in val2['venue']['location']:
+                        ville = ''
+                    else:
+                        ville = val2['venue']['location']['city']
+
+                if 'phone' not in val2['venue']['contact']:
+                    telephone = ' '
                 else:
-                    latitude = val2['venue']['location']['lat']
+                    telephone = val2['venue']['contact']['phone']
 
-                if 'lng' not in val2['venue']['location']:
-                    longitude = ''
-                else:
-                    longitude = val2['venue']['location']['lng']
-
-                if 'postalCode' not in val2['venue']['location']:
-                    codePostal = ''
-                else:
-                    codePostal = val2['venue']['location']['postalCode']
-
-                if 'city' not in val2['venue']['location']:
-                    ville = ''
-                else:
-                    ville = val2['venue']['location']['city']
-
-            if 'phone' not in val2['venue']['contact']:
-                telephone = ' '
-            else:
-                telephone = val2['venue']['contact']['phone']
-
-            attraction = models.Attraction(nom, section, description, adresse)
-            attraction.foursquare_id = id
-            # attraction.hours = 'NULL'
-            attraction.latitude = latitude
-            attraction.longitude = longitude
-            # attraction.photo = 'NULL'
-            attraction.postcode = codePostal
-            listAttraction.add(attraction)
-    for attract in set(listAttraction):
-        if models.Attraction.query.filter_by(foursquare_id = attract.foursquare_id).count() == 0 :
-            db.session.add(attract)
-        print attract.foursquare_id
-
-
-    print "\n".join([x.__repr__().encode('UTF8') for x in set(listAttraction)])
-    l = list(set(listAttraction))
+                attraction = models.Attraction(nom, section, description, adresse)
+                attraction.foursquare_id = id
+                # attraction.hours = 'NULL'
+                attraction.latitude = latitude
+                attraction.longitude = longitude
+                # attraction.photo = 'NULL'
+                attraction.postcode = codePostal
+                listAttraction.append(attraction)
+                db.session.add(attraction)
+    for attract in listAttraction:
+        print attract.name
     return listAttraction
 
 
