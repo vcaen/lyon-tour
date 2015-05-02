@@ -10,7 +10,7 @@ import json
 
 class Tour:
 
-    def __init__(self, deb, fin, list):
+    def __init__(self, deb, fin, list=None):
         dateDebut = datetime.datetime.strptime(deb, '%d%m%Y')
         self.DateDebut = str(dateDebut.date())
         dateFin = datetime.datetime.strptime(fin, '%d%m%Y')
@@ -21,13 +21,9 @@ class Tour:
         # self.PI.append(Attraction("Cafe Mokxa","CAFE", "descrition","Adresse"))
         self.Filtre = list
 
-        listSection = []
-        for s in list:
-            section = Section()
-            section.name = s
-            listSection.append(section)
 
-        self.PI = executeRequests(self.nbJour, listSection)
+
+        self.PI = executeRequests(self.nbJour, list)
 
 
 

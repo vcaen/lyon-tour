@@ -33,7 +33,7 @@ class Attraction(db.Model):
     hours = db.Column(db.String(30), nullable=True)
     section_id =  db.Column(db.Integer, db.ForeignKey('section.id'))
 
-    def __init__(self, nom , untype, desc, adress):
+    def __init__(self, nom=None , untype=None, desc=None, adress=None):
         self.name = nom
         self.description = desc
         self.section = untype
