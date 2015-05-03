@@ -20,17 +20,18 @@ class Section(db.Model):
 
 class Attraction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    foursquare_id = db.Column(db.String(1024), unique=True)
+    foursquare_id = db.Column(db.String(50), unique=True)
     name = db.Column(db.String(255), nullable=True)
-    description = db.Column(db.String(2055), nullable=True)
+    description = db.Column(db.Text, nullable=True)
     photo = db.Column(db.String(511), nullable=True)
-    address = db.Column(db.String(1023), nullable=True)
-    latitude = db.Column(db.String(255), nullable=True)
-    longitude = db.Column(db.String(255), nullable=True)
+    address = db.Column(db.Text, nullable=True)
+    latitude = db.Column(db.String(50), nullable=True)
+    longitude = db.Column(db.String(50), nullable=True)
     postcode = db.Column(db.Integer, nullable=True)
-    ville = db.Column(db.String(255), nullable=True)
+    ville = db.Column(db.String(100), nullable=True)
     phone = db.Column(db.String(25), nullable=True)
     hours = db.Column(db.String(30), nullable=True)
+    rating = db.Column(db.Integer, nullable=False, default=-1)
     section_id =  db.Column(db.Integer, db.ForeignKey('section.id'))
 
     def __init__(self, nom=None , untype=None, desc=None, adress=None):

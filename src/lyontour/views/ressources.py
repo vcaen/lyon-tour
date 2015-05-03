@@ -41,8 +41,7 @@ class PhotoResource(Resource):
     def get(self, photo_id):
         picture_manager = PictureManager()
         return flask.send_file(picture_manager.get_picture_path(photo_id), mimetype='image/jpeg')
-        # response = flask.make_response(something)
-        # response.headers['content-type'] = 'application/octet-stream'
+
 
 api.add_resource(PhotoResource, '/photo/<string:photo_id>')
 

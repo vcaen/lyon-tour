@@ -35,10 +35,10 @@ class FoursquareManager:
     """
         Retreive and save if not exist a photo for the given venue
     """
-    def first_photo_url_for_venue(self, venue_id):
+    def first_photo_for_venue(self, venue_id):
         r = requests.get(self.VENUES + '/' + venue_id, params=params)
         if(r.status_code != requests.codes.ok) :
-            print "Photo Request Error " + r.status_code
+            print "Photo Request Error " + str(r.status_code)
             return None
         photos = r.json()['response']['venue']['photos']
         if photos['count'] > 0 :
@@ -56,6 +56,10 @@ class FoursquareManager:
                                 f.flush()
         return venue_id
 
+    def has_local_photo_for_venue(self, venue_id):
+        photoName = config.PHOTO_DIR_PATH+ "/" + venue_id + self.PHOTO_EXT
+        return os.path.exists(photoName)
+
     def get_venues(self, limit, sections=None):
         if sections is None or len(sections) == 0 :
             resp = Section.query.all()
@@ -72,16 +76,22 @@ class FoursquareManager:
             data = json.loads(response.text)
             for val in data["response"]["groups"]:
                 for item in val['items']:
-                    if db.session.query(Attraction).filter_by(foursquare_id=item['venue']['id']).first():
+                    venue_id = item['venue']['id']
+                    if db.session.query(Attraction).filter_by(foursquare_id=venue_id).first():
+                        if not self.has_local_photo_for_venue(venue_id):
+                            self.first_photo_for_venue(venue_id)
                         continue
                     attraction = Attraction()
                     # Basics
-                    attraction.foursquare_id = item['venue']['id']
+                    attraction.foursquare_id = venue_id
                     attraction.name = item['venue']['name']
                     if 'description' in item['venue']:
                         attraction.description = item['venue']['description']
                     elif 'tips' in item:
-                        attraction.description = item['tips'][0]['text']
+                        for tip in item['tips']:
+                            if "le" in tip['text']:
+                                attraction.description = tip['text']
+                                break
 
                     # Location
                     if 'location' in item['venue'] :
@@ -98,9 +108,12 @@ class FoursquareManager:
 
                     if 'phone' in item['venue']['contact']:
                         attraction.phone = item['venue']['contact']['phone']
-                    attraction.section = section
+                    attraction.section = Section.query.filter_by(name=section).first()
 
-                    attraction.photo = self.first_photo_url_for_venue(attraction.foursquare_id)
+                    if 'rating' in item['venue']:
+                        attraction.rating = round(item['venue']['rating'],0)
+
+                    attraction.photo = self.first_photo_for_venue(attraction.foursquare_id)
                     listAttraction.add(attraction)
                     print attraction.name
         return listAttraction
