@@ -7,17 +7,29 @@ from lyontour import db
 session = db.session
 
 
-class AttractionSchema(ModelSchema):
-    class Meta:
-        model = Attraction
-        sqla_session = session
+class AttractionSchema(Schema):
+
+    id = fields.Int()
+    foursquare_id = fields.Str()
+    name = fields.Str()
+    description = fields.Str()
+    photo = fields.Str()
+    address = fields.Str()
+    latitude = fields.Str()
+    longitude = fields.Str()
+    postcode = fields.Int()
+    ville = fields.Str()
+    phone = fields.Str()
+    hours = fields.Str()
+    rating = fields.Int()
+    section_id =  fields.Int()
 
 class SectionSchema(ModelSchema):
     class Meta:
         model = Section
         sqla_session = session
 
-class TourSchema(ModelSchema):
+class TourSchema(Schema):
     count = fields.Method('get_PI_count')
     DateDebut = fields.Str()
     DateFin = fields.Str()

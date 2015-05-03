@@ -61,6 +61,7 @@ class FoursquareManager:
         return os.path.exists(photoName)
 
     def get_venues(self, limit, sections=None):
+        print "getvenue"
         if sections is None or len(sections) == 0 :
             resp = Section.query.all()
             listSection = [ x.name for x in resp ]
@@ -68,6 +69,8 @@ class FoursquareManager:
             listSection = sections
         listAttraction = set()
         params['limit'] = limit
+
+        print "\n".join(listSection)
 
         for section in listSection:
             params['section'] = section
@@ -89,7 +92,7 @@ class FoursquareManager:
                         attraction.description = item['venue']['description']
                     elif 'tips' in item:
                         for tip in item['tips']:
-                            if "le" in tip['text']:
+                            if "e" in tip['text'] or "a" in tip['text']:
                                 attraction.description = tip['text']
                                 break
 
@@ -115,7 +118,8 @@ class FoursquareManager:
 
                     attraction.photo = self.first_photo_for_venue(attraction.foursquare_id)
                     listAttraction.add(attraction)
-                    print attraction.name
+                    #print attraction.name.encode('UTF-8')
+
         return listAttraction
 
 
@@ -136,10 +140,15 @@ def executeRequests(limit, listSection=None):
         db.session.add_all(attractions)
         db.session.commit()
 
+    #print "limit " + str(limit)
+
     if not listSection:
-        return Attraction.query.limit(limit).all()
+        a = Attraction.query.limit(limit).all()
     else:
-        return Attraction.query.join(Section).filter(Section.name.in_(listSection)).all()
+        a =  Attraction.query.join(Section).filter(Section.name.in_(listSection)).all()
+    print "\n".join([x.name.encode('UTF-8') for x in a ])
+
+    return a
 
 
 if __name__=='__main__':
