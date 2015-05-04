@@ -8,9 +8,8 @@ from lyontour import config
 
 app = Flask(__name__)
 api = Api(app)
-db = SQLAlchemy(app)
 app.config.from_object(config)
-
+db = SQLAlchemy(app)
 from lyontour.views import status
-from lyontour.model import models
 from lyontour.views import ressources
+

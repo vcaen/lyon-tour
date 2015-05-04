@@ -144,6 +144,7 @@ def executeRequests(limit, listSection=None):
     #         print attraction.name
     return listAttraction
 
+
 if __name__=='__main__':
     listSection = []
     listSection.append('arts')

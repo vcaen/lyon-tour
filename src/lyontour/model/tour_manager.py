@@ -11,46 +11,32 @@ import json
 class Tour:
 
     def __init__(self, deb, fin, list=None):
-        dateDebut = datetime.datetime.strptime(deb, '%d%m%Y')
-        self.DateDebut = str(dateDebut.date())
-        dateFin = datetime.datetime.strptime(fin, '%d%m%Y')
-        self.DateFin = str(dateFin.date())
-        self.nbJour = str((dateFin - dateDebut).days + 1)
-        # self.PI.append(Attraction('Beaux Arts',"Musee", "descrition","Adresse"))
-        # self.PI.append(Attraction("Tete d'Or","PARC", "descrition","Adresse"))
-        # self.PI.append(Attraction("Cafe Mokxa","CAFE", "descrition","Adresse"))
+        self.DateDebut = datetime.datetime.strptime(deb, '%d%m%Y')
+        self.DateFin = datetime.datetime.strptime(fin, '%d%m%Y')
+        self.nbJour = (self.DateFin - self.DateDebut).days + 1
+        self.Jours = []
         self.Filtre = list
+
+        for i in range(0,self.nbJour,1):
+            self.Jours.append(Jour(self.DateDebut + datetime.timedelta(days = i)))
+
         self.PI = executeRequests(self.nbJour, list)
 
-
-
-    def toString(self):
-        response = JSONObject()
-        response.dateDebut = self.DateDebut
-        response.dateFin = self.DateFin
-        response.filtre = self.Filtre
-        response.PI = []
-        for a in self.PI:
-            item = JSONObject()
-            item.nom = a.name
-            item.description = a.description
-            item.adresse = a.address
-            item.codePostal = a.postcode
-            item.id = a.id
-            response.PI.append(item)
-
-        return str(response.toJson())
 
 class Itineraire:
     def __init__(self):
         self.Jours = []
-        for i in range(0,self.nbJour,1):
-            Temp = ((self.DateDebut + datetime.timedelta(days = i)).date())
-            self.Jours.append(Jour(str(Temp)))
 
 class Jour:
     def __init__(self, date):
         self.date = date
+        self.attractions = []
+
+    def addAttraction(self, attraction):
+        self.attractions.append(attraction)
+
+    def getDate(self):
+        return self.date
 
 class JSONObject:
     def toJson(self):
