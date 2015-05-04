@@ -1,4 +1,7 @@
 # coding=utf-8
+from lyontour import db
+from lyontour.model.foursquare_manager import executeRequests
+
 __author__ = 'mrcherif'
 
 from lyontour.model.models import WeatherDay, Section
@@ -16,7 +19,8 @@ class filter_manager:
     def __init__(self):
         pass
 
-    def getRainByDay(self, jour):
+    def getWeatherByDay(self, jour):
+        res = [] #Tableau Rain(bool) / Snow(Oui, non)
         date_jour = datetime.datetime.strptime(jour, '%Y-%m-%d').date()
         # to_day = datetime.datetime.now().date()
         # if date_jour < to_day:
@@ -26,15 +30,44 @@ class filter_manager:
         day = WeatherDay.query.get(jour)
         if not(day is None):
             pluie = day.rain
-            return pluie <= 2.5
+            snow = day.snow
+            res.append(pluie<=2.5)
+            res.append(snow)
+            return res
         else:
             f = urllib2.urlopen(meteo_api_url)
             json_string = f.read()
             parsed_json = json.loads(json_string)
             f.close()
             rain = parsed_json[jour + ' 12:00:00']["pluie"]
-            # TODO: Add to the date base in WeakDay
-            return rain >= 2.5
+            snow = parsed_json[jour + ' 12:00:00']["snow"]
+            pluie = day.rain
+            snow = day.snow
+            res.append(pluie<=2.5)
+            res.append(snow)
+            day = WeatherDay(date_jour, rain, snow)
+            db.session.add(day)
+            db.session.commit()
+            return res
+
+    def getRainByDay(self, jour):
+        date_jour = datetime.datetime.strptime(jour, '%Y-%m-%d').date()
+        # to_day = datetime.datetime.now().date()
+        # if date_jour < to_day:
+        #     return "erreur, date passée \n"
+        # else:
+            #snow = WeatherDay.query.filter_by(date=jour).first().snow
+        day = WeatherDay.query.get(jour)
+        if not(day is None):
+            pluie = day.rain
+            return pluie<=2.5
+        else:
+            f = urllib2.urlopen(meteo_api_url)
+            json_string = f.read()
+            parsed_json = json.loads(json_string)
+            f.close()
+            pluie = parsed_json[jour + ' 12:00:00']["rain"]
+            return pluie
 
     def getSnowByDay(self, jour):
         date_jour = datetime.datetime.strptime(jour, '%Y-%m-%d').date()
@@ -53,13 +86,24 @@ class filter_manager:
             parsed_json = json.loads(json_string)
             f.close()
             snow = parsed_json[jour + ' 12:00:00']["risque_neige"]
-            # TODO: Add to the date base in WeakDay
             return snow
 
     def filtre_meteo(self, jour, preference):
         for i in preference:
             section = Section.query.filter_by(name=i).first()
             if not(section is None):
-                    if (section.weather == "bad" and (self.getRainByDay(jour) is False or self.getSnowByDay(jour) == "non")) or (section.weather == "good" and (self.getRainByDay(jour) is True or self.getSnowByDay(jour) == "oui")):
+                    if (section.weather == "bad" and (self.getWeatherByDay(jour)[0] is False or self.getWeatherByDay(jour)[1] == "non")) or (section.weather == "good" and (self.getWeatherByDay(jour)[0] is True or self.getWeatherByDay(jour)[1] == "oui")):
                         preference.remove(i)
         return preference
+
+    def getAttractionFiltred(self, liste_jours, preferences_user):
+        attractions = []
+        preferences_filtrees = []
+        for i, elt in liste_jours:
+            preferences_filtrees = self.filtre_meteo(elt.getDate(), preferences_user)
+            attractions = executeRequests(10, preferences_filtrees)
+            for a in attractions:
+                if (a in liste_jours[i-1].getAttractions) and
+                    attractions.remove[a]
+            i.addAttraction(attractions)
+        return attractions

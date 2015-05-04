@@ -35,6 +35,9 @@ class Jour:
     def addAttraction(self, attraction):
         self.attractions.append(attraction)
 
+    def getDate(self):
+        return self.date
+
 class JSONObject:
     def toJson(self):
         return json.dumps(self, default=lambda o: o.__dict__,sort_keys=True, indent=4, separators=(',', ': '))
