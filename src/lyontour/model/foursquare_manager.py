@@ -12,7 +12,6 @@ import json
 from lyontour.model import models
 from lyontour import db, config
 
-
 requests_cache.install_cache(expire_after=3600)
 
 
@@ -60,89 +59,95 @@ class FoursquareManager:
         photoName = config.PHOTO_DIR_PATH+ "/" + venue_id + self.PHOTO_EXT
         return os.path.exists(photoName)
 
-    def get_venues(self, limit, sections=None):
-        if sections is None or len(sections) == 0 :
-            resp = Section.query.all()
-            listSection = [ x.name for x in resp ]
-        else:
-            listSection = sections
+    def get_venues(self, limit, section):
+        # listSection = []
+        # if sections is None or len(sections) == 0 :
+        #      resp = Section.query.all()
+        #      listSection = [ x.name for x in resp ]
+        # else:
+        #     listSection = sections
+        #
         listAttraction = set()
         params['limit'] = limit
 
-        for section in listSection:
-            params['section'] = section
-            response = requests.get(url, params=params)
-            # print response.url
-            data = json.loads(response.text)
-            for val in data["response"]["groups"]:
-                for item in val['items']:
-                    venue_id = item['venue']['id']
-                    if db.session.query(Attraction).filter_by(foursquare_id=venue_id).first():
-                        if not self.has_local_photo_for_venue(venue_id):
-                            self.first_photo_for_venue(venue_id)
-                        continue
-                    attraction = Attraction()
-                    # Basics
-                    attraction.foursquare_id = venue_id
-                    attraction.name = item['venue']['name']
-                    if 'description' in item['venue']:
-                        attraction.description = item['venue']['description']
-                    elif 'tips' in item:
-                        for tip in item['tips']:
-                            if "le" in tip['text']:
-                                attraction.description = tip['text']
-                                break
+        #for section in listSection:
+        params['section'] = section
+        response = requests.get(url, params=params)
+        # print response.url
+        data = json.loads(response.text)
+        for val in data["response"]["groups"]:
+            for item in val['items']:
+                venue_id = item['venue']['id']
+                if db.session.query(Attraction).filter_by(foursquare_id=venue_id).first():
+                    if not self.has_local_photo_for_venue(venue_id):
+                        self.first_photo_for_venue(venue_id)
+                    continue
+                attraction = Attraction()
+                # Basics
+                attraction.foursquare_id = venue_id
+                attraction.name = item['venue']['name']
+                if 'description' in item['venue']:
+                    attraction.description = item['venue']['description']
+                elif 'tips' in item:
+                    for tip in item['tips']:
+                        if "le" in tip['text']:
+                            attraction.description = tip['text']
+                            break
 
-                    # Location
-                    if 'location' in item['venue'] :
-                        if 'address' in item['venue']['location']:
-                            attraction.address = item['venue']['location']['address']
-                        if 'lat' in item['venue']['location']:
-                            attraction.latitude = item['venue']['location']['lat']
-                        if 'lng' in item['venue']['location']:
-                            attraction.longitude = item['venue']['location']['lng']
-                        if 'postalCode' in item['venue']['location']:
-                            attraction.postcode = item['venue']['location']['postalCode']
-                        if 'city' in item['venue']['location']:
-                            attraction.ville = item['venue']['location']['city']
+                # Location
+                if 'location' in item['venue'] :
+                    if 'address' in item['venue']['location']:
+                        attraction.address = item['venue']['location']['address']
+                    if 'lat' in item['venue']['location']:
+                        attraction.latitude = item['venue']['location']['lat']
+                    if 'lng' in item['venue']['location']:
+                        attraction.longitude = item['venue']['location']['lng']
+                    if 'postalCode' in item['venue']['location']:
+                        attraction.postcode = item['venue']['location']['postalCode']
+                    if 'city' in item['venue']['location']:
+                        attraction.ville = item['venue']['location']['city']
 
-                    if 'phone' in item['venue']['contact']:
-                        attraction.phone = item['venue']['contact']['phone']
-                    attraction.section = Section.query.filter_by(name=section).first()
+                if 'phone' in item['venue']['contact']:
+                    attraction.phone = item['venue']['contact']['phone']
+                attraction.section = Section.query.filter_by(name=section).first()
 
-                    if 'rating' in item['venue']:
-                        attraction.rating = round(item['venue']['rating'],0)
+                if 'rating' in item['venue']:
+                    attraction.rating = round(item['venue']['rating'],0)
 
-                    attraction.photo = self.first_photo_for_venue(attraction.foursquare_id)
-                    listAttraction.add(attraction)
-                    print attraction.name
+                attraction.photo = self.first_photo_for_venue(attraction.foursquare_id)
+                listAttraction.add(attraction)
+                db.session.add(attraction)
         return listAttraction
 
 
-
-
 def executeRequests(limit, listSection=None):
-
+    listAttraction = []
     if not listSection:
-        attractions_count = Attraction.query.limit(limit).count()
-    else:
-        attractions_count = Attraction.query.join(Section).filter(Section.name.in_(listSection)).count()
+        resp = Section.query.all()
+        listSection = [ x.name for x in resp ]
 
-
-
-    if attractions_count < limit :
-        foursquare_manager = FoursquareManager()
-        attractions = foursquare_manager.get_venues(limit, listSection)
-        db.session.add_all(attractions)
-        db.session.commit()
-
-    if not listSection:
-        return Attraction.query.limit(limit).all()
-    else:
-        return Attraction.query.join(Section).filter(Section.name.in_(listSection)).all()
-
+    for section in listSection:
+        listAttractionSection = set()
+        attractions_count = 0
+        for attraction in Attraction.query.join(Section).filter(Section.name==section).limit(limit):
+            listAttractionSection.add(attraction)
+            attractions_count = attractions_count+1
+        if attractions_count < limit :
+            foursquare_manager = FoursquareManager()
+            for attraction in foursquare_manager.get_venues(limit, section):
+                listAttractionSection.add(attraction)
+        listAttraction.append(listAttractionSection)
+    db.session.commit()
+    # for section in listAttraction:
+    #     print '   '
+    #     for attraction in section:
+    #         print attraction.name
+    return listAttraction
 
 if __name__=='__main__':
-    executeRequests(10)
+    listSection = []
+    listSection.append('arts')
+    listSection.append('drinks')
+    executeRequests(5, listSection)
 
 
