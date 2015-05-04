@@ -24,6 +24,9 @@ class AttractionSchema(Schema):
     rating = fields.Int()
     section_id =  fields.Int()
 
+class JourSchema(Schema):
+    date = fields.Time()
+
 class SectionSchema(ModelSchema):
     class Meta:
         model = Section
@@ -34,6 +37,7 @@ class TourSchema(Schema):
     DateDebut = fields.Str()
     DateFin = fields.Str()
     PI = fields.List(fields.Nested(AttractionSchema))
+    Jours = fields.List(fields.Nested(JourSchema))
 
     def get_PI_count(self, obj):
         return len(obj.PI)
