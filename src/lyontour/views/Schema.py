@@ -24,8 +24,13 @@ class AttractionSchema(Schema):
     rating = fields.Int()
     section_id =  fields.Int()
 
+class EtapeSchema(Schema):
+    heure = fields.Time()
+
 class JourSchema(Schema):
     date = fields.Time()
+    etapes = fields.List(fields.Nested(EtapeSchema))
+    attractions = fields.List(fields.Nested(AttractionSchema))
 
 class SectionSchema(ModelSchema):
     class Meta:

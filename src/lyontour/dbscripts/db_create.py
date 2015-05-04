@@ -18,11 +18,11 @@ def populate_sections():
     from lyontour.model.models import Section
     print "Filling Section table .."
     sections = [
-        Section("food", "whatever", "whatever", 2),
+        Section("food", "whatever", "eat", 2),
         Section("drinks", "whatever", "evening/night", 3),
-        Section("coffee", "whatever", "evening/night", 2),
-        Section("shops", "bad", "morning/evening", 4),
-        Section("arts", "bad", "evening", 2),
+        Section("coffee", "whatever", "day", 2),
+        Section("shops", "bad", "day", 4),
+        Section("arts", "bad", "day", 2),
         Section("outdoors", "good", "day", 3),
         Section("sights", "good", "day", 3)
     ]
