@@ -25,13 +25,12 @@ class AttractionSchema(Schema):
     section_id =  fields.Int()
 
 class EtapeSchema(Schema):
-    heure = fields.Time()
+    heure = fields.Int()
     attraction = fields.Nested(AttractionSchema)
 
 class JourSchema(Schema):
-    date = fields.Time()
+    date = fields.DateTime("%d%m%Y")
     etapes = fields.List(fields.Nested(EtapeSchema))
-    attractions = fields.List(fields.Nested(AttractionSchema))
 
 class SectionSchema(ModelSchema):
     class Meta:

@@ -11,7 +11,7 @@ todos = {}
 @app.route('/tour', methods=['POST', 'GET'])
 def Test():
     if(request.method == 'POST'):
-        list = str(request.form['filtre']).split(',')
+
         return (Tour(request.form['datedebut'], request.form['datefin'], list)).toString()
     else:
         filtres = request.args.get('filtre')

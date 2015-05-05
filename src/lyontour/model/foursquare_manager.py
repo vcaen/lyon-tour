@@ -171,7 +171,7 @@ def executeRequests(limit, listSection=None):
 
 def executeRequests1(limit, listSection=None):
     listAttraction = []
-    if not listSection:
+    if listSection is None:
         resp = Section.query.all()
         listSection = [ x.name for x in resp ]
 
