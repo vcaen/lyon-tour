@@ -19,14 +19,13 @@ def populate_sections():
     print "Filling Section table .."
     sections = [
         Section("food", "whatever", "eat", 2),
-        Section("drinks", "whatever", "evening/night", 3),
-        Section("coffee", "whatever", "day", 2),
-        Section("shops", "bad", "day", 4),
-        Section("arts", "bad", "day", 2),
-        Section("outdoors", "good", "day", 3),
-        Section("sights", "good", "day", 3)
+        Section("drinks", "whatever", "evening/night", 2),
+        Section("coffee", "whatever", "day", 1),
+        Section("shops", "bad", "day", 2),
+        Section("arts", "bad", "day", 3),
+        Section("outdoors", "good", "day", 2),
+        Section("sights", "good", "day/evening", 1)
     ]
-
     db.session.add_all(sections)
     db.session.commit();
     print "Section table Filled "

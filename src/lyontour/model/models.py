@@ -6,7 +6,7 @@ class Section(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), primary_key=True)
     weather = db.Column(db.String(45), nullable=True) # bad, good, whatever
-    dayTime = db.Column(db.String(45), nullable=True)  # day, evening, night, whatever, evening/night
+    dayTime = db.Column(db.String(45), nullable=True)  # eatTime, evening/night, day, day/evening
     duration = db.Column(db.Integer, nullable=True)
     attractions = db.relationship('Attraction', backref='section', lazy='joined' )
 
@@ -53,9 +53,14 @@ class Attraction(db.Model):
         return hash(self.foursquare_id)
 
 class WeatherDay(db.Model):
-    date = db.Column(db.Date, primary_key=True)
-    rain = db.Column(db.Float, nullable=True)
-    snow = db.Column(db.Boolean, nullable=True)
+    m_date = db.Column(db.Date, primary_key=True)
+    m_rain = db.Column(db.Float, nullable=True)
+    m_snow = db.Column(db.Boolean, nullable=True)
+
+    def __init__(self, date=None, rain=None, snow=None):
+        self.m_date = date
+        self.m_date = rain
+        self.m_snow = snow
 
 
 

@@ -26,6 +26,7 @@ class AttractionSchema(Schema):
 
 class EtapeSchema(Schema):
     heure = fields.Time()
+    attraction = fields.Nested(AttractionSchema)
 
 class JourSchema(Schema):
     date = fields.Time()
