@@ -12,27 +12,25 @@ from flask.ext.restful import abort
 from flask.ext.restful import Resource
 from flask.ext.restful import marshal_with
 from lyontour import api
-from schema import tour_schema
+from Schema import tour_schema, filter_schema
+from lyontour.model.tour_manager import Tour
+from lyontour.model.filter_manager import filter_manager
 
 
 
 class AttractionResource(Resource):
-
     FILTRE = 'filtre'
     DATEFIN = 'datefin'
     DATEDEBUT = 'datedebut'
-
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument(AttractionResource.DATEDEBUT, type=str, required=True, help='Merci de donner une date de début')
         parser.add_argument(AttractionResource.DATEFIN, type=str, required=True, help="Merci de donner une date de fin")
         parser.add_argument(AttractionResource.FILTRE, type=str)
         args = parser.parse_args()
-
         return tour_schema.dump(Tour(args[AttractionResource.DATEDEBUT],
-                     args[AttractionResource.DATEFIN],
-                     args[AttractionResource.FILTRE])).data
-
+        args[AttractionResource.DATEFIN],
+        args[AttractionResource.FILTRE])).data
 
 api.add_resource(AttractionResource, '/attraction')
 
@@ -44,4 +42,5 @@ class PhotoResource(Resource):
 
 
 api.add_resource(PhotoResource, '/photo/<string:photo_id>')
+
 

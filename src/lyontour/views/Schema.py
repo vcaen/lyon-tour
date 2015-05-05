@@ -44,14 +44,19 @@ class TourSchema(Schema):
     PI = fields.List(fields.Nested(AttractionSchema))
     Jours = fields.List(fields.Nested(JourSchema))
 
+
     def get_PI_count(self, obj):
         return len(obj.PI)
 
     # class Meta:
     #     fields = ('DateDebut', 'DateFin', 'PI')
 
+class FilterSchema(Schema):
+    filtred_attractions = fields.List(fields.Str())
+
 attraction_schema = AttractionSchema()
 section_schema = SectionSchema()
 tour_schema = TourSchema()
+filter_schema = FilterSchema()
 
 

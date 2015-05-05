@@ -54,12 +54,16 @@ class Attraction(db.Model):
 
 class WeatherDay(db.Model):
     m_date = db.Column(db.Date, primary_key=True)
-    m_rain = db.Column(db.Float, nullable=True)
+    m_temp = db.Column(db.Float, nullable=True)
+    m_cloud = db.Column(db.String(100), nullable=True)
+    m_rain = db.Column(db.Boolean, nullable=True)
     m_snow = db.Column(db.Boolean, nullable=True)
 
-    def __init__(self, date=None, rain=None, snow=None):
+    def __init__(self, date=None, temp=None, cloud=None, rain=None, snow=None):
         self.m_date = date
-        self.m_date = rain
+        self.m_temp = temp
+        self.m_cloud = cloud
+        self.m_rain = rain
         self.m_snow = snow
 
 
