@@ -93,7 +93,7 @@ class Tour:
                     currentA = calculDistance(currentA, eat, ['food'])
                     jour.etapes.append(Etape(currentH, currentA))
                     midi = True
-                    currentH = currentH + datetime.timedelta(hours = 2)
+                    currentH = currentH + 2
                 elif (currentH >=19 and currentH <21) and len(eat)!=0 and soir == False :
                     currentA = calculDistance(currentA, eat, ['food'])
                     jour.etapes.append(Etape(currentH, currentA))
@@ -120,7 +120,10 @@ class Tour:
                     currentH = currentH + 1
 
     def getJours(self):
-        return self.Jours
+        liste_jour = []
+        for jour in self.Jours:
+            liste_jour.append(jour.getDate())
+        return liste_jour
 
 
 class Itineraire:
@@ -130,27 +133,20 @@ class Itineraire:
 class Jour:
     def __init__(self, date, filtres):
         self.date = date
+        self.attractions = []
+        f_manager = filter_manager([date])
+        weather = f_manager.getWeatherByDay(str(self.date))
+        self.weather_temp = weather["temp"]
+        if weather["pluie"] is True:
+            self.weather_status = "rainy"
+        else:
+            self.weather_status = weather["nuage"]
         self.etapes=[]
         self.filtres = filtres
 
-        # f_manager = filter_manager()
-        # weather = f_manager.getWeatherByDay(date)
-        # if weather["pluie"] is True:
-        #     self.weather_status = "rainy"
-        # else:
-        #     self.weather_status = weather["nuage"]
-
+    #renvoie pour l'instance jour un string(rainy, cloudy, partly cloudy, sunny)
     def getWeatherStatus(self):
         return self.weather_status
-
-    def addAttraction(self, attraction):
-        self.attractions.append(attraction)
-
-    def getDate(self):
-        return self.date
-
-    def getAttractions(self):
-        return self.attractions
 
 class Etape:
     def __init__(self, Heure, Attraction):

@@ -42,5 +42,3 @@ class PhotoResource(Resource):
 
 
 api.add_resource(PhotoResource, '/photo/<string:photo_id>')
-
-
