@@ -1,6 +1,7 @@
 from sqlalchemy import Enum
 from models import Attraction, Section
 from foursquare_manager import executeRequests1
+from lyontour import db
 from foursquare_manager import executeRequests
 from filter_manager import filter_manager
 
@@ -28,14 +29,17 @@ class Tour:
         self.nbJour = (self.DateFin - self.DateDebut).days + 1
         self.Jours = []
         self.Filtre = str(list).split(',')
-        self.attractions = executeRequests1(int(10*self.nbJour/len(self.Filtre)), self.Filtre)
+        if len(self.Filtre)>0:
+            nombreRequest = int(10*self.nbJour/len(self.Filtre))
+        else:
+            nombreRequest = 1
+        self.attractions = executeRequests1(nombreRequest, self.Filtre)
         for i in range(0,self.nbJour,1):
             self.Jours.append(Jour((self.DateDebut + datetime.timedelta(days = i)), self.Filtre))
         self.doItineraire()
 
     def doItineraire(self):
         night = []
-        eat = []
         day = []
         evnight = []
         dayev = []
@@ -60,12 +64,18 @@ class Tour:
 
             while currentH<23:
                 if currentH == 8 :
-                    print(len(day))
-                    for att in day:
-                        if att.section.name in jour.filtres :
-                            currentA = att
-                            day.remove(att)
-                            break
+                    if len(day) != 0:
+                        for att in day:
+                            if att.section.name in jour.filtres :
+                                currentA = att
+                                day.remove(att)
+                                break
+                    elif len(dayev)!=0:
+                        for att in dayev:
+                            if att.section.name in jour.filtres :
+                                currentA = att
+                                dayev.remove(att)
+                                break
                     jour.etapes.append(Etape(currentH, currentA))
                     currentH = currentH +  currentA.section.duration
                 elif currentH >=13 and midi == False:
@@ -93,7 +103,7 @@ class Tour:
                     currentA = calculDistance(currentA, eat, ['food'])
                     jour.etapes.append(Etape(currentH, currentA))
                     midi = True
-                    currentH = currentH + datetime.timedelta(hours = 2)
+                    currentH = currentH + 2
                 elif (currentH >=19 and currentH <21) and len(eat)!=0 and soir == False :
                     currentA = calculDistance(currentA, eat, ['food'])
                     jour.etapes.append(Etape(currentH, currentA))
@@ -133,29 +143,10 @@ class Jour:
         self.etapes=[]
         self.filtres = filtres
 
-        # f_manager = filter_manager()
-        # weather = f_manager.getWeatherByDay(date)
-        # if weather["pluie"] is True:
-        #     self.weather_status = "rainy"
-        # else:
-        #     self.weather_status = weather["nuage"]
-
     def getWeatherStatus(self):
         return self.weather_status
-
-    def addAttraction(self, attraction):
-        self.attractions.append(attraction)
-
-    def getDate(self):
-        return self.date
-
-    def getAttractions(self):
-        return self.attractions
 
 class Etape:
     def __init__(self, Heure, Attraction):
         self.heure = Heure
         self.attraction = Attraction
-
-    def getDate(self):
-        return self.date
