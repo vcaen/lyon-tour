@@ -3,13 +3,21 @@ if [ `docker ps -aq | wc -l` -gt 0 ]; then
 	docker kill $(sudo docker ps -aq);
 	docker rm -f $(sudo docker ps -aq);
 fi
-docker run --name lyon-tour-database -v /home/h4312/database:/var/lib/mysql -d -p 3306:3306 vcaen/lyon-tour-mysql && \
-docker run -v /home/h4312/app:/app --restart=on-failure -d -p 8080:8000 --link lyon-tour-database:webdb vcaen/lyon-tour-flask;
-docker run -v /home/h4312/app:/app --restart=on-failure -d -p 8081:8000 --link lyon-tour-database:webdb vcaen/lyon-tour-flask;
-docker run -v /home/h4312/app:/app --restart=on-failure -d -p 8082:8000 --link lyon-tour-database:webdb vcaen/lyon-tour-flask;
-docker run -v /home/h4312/app:/app --restart=on-failure -d -p 8083:8000 --link lyon-tour-database:webdb vcaen/lyon-tour-flask;
-docker run -v /home/h4312/app:/app --restart=on-failure -d -p 8084:8000 --link lyon-tour-database:webdb vcaen/lyon-tour-flask;
-docker run -v /home/h4312/app:/app --restart=on-failure -d -p 8085:8000 --link lyon-tour-database:webdb vcaen/lyon-tour-flask;
-docker run -v /home/h4312/app:/app --restart=on-failure -d -p 8086:8000 --link lyon-tour-database:webdb vcaen/lyon-tour-flask;
-docker run -v /home/h4312/app:/app --restart=on-failure -d -p 8087:8000 --link lyon-tour-database:webdb vcaen/lyon-tour-flask;
-docker run --name nginx -d -p 80:80 my-nginx 
+docker run --name lyon-tour-database -v /home/h4312/database:/var/lib/mysql -d -p 3306:3306 vcaen/lyon-tour-mysql;
+docker run -v /home/h4312/app:/app --restart=on-failure -d --name flask0 --link lyon-tour-database:webdb vcaen/lyon-tour-flask;
+docker run -v /home/h4312/app:/app --restart=on-failure -d --name flask1 --link lyon-tour-database:webdb vcaen/lyon-tour-flask;
+docker run -v /home/h4312/app:/app --restart=on-failure -d --name flask2 --link lyon-tour-database:webdb vcaen/lyon-tour-flask;
+docker run -v /home/h4312/app:/app --restart=on-failure -d --name flask3 --link lyon-tour-database:webdb vcaen/lyon-tour-flask;
+docker run -v /home/h4312/app:/app --restart=on-failure -d --name flask4 --link lyon-tour-database:webdb vcaen/lyon-tour-flask;
+docker run -v /home/h4312/app:/app --restart=on-failure -d --name flask5 --link lyon-tour-database:webdb vcaen/lyon-tour-flask;
+docker run -v /home/h4312/app:/app --restart=on-failure -d --name flask6 --link lyon-tour-database:webdb vcaen/lyon-tour-flask;
+docker run -v /home/h4312/app:/app --restart=on-failure -d --name flask7 --link lyon-tour-database:webdb vcaen/lyon-tour-flask;
+docker run --name nginx -d -p 80:80 --link flask0:flask0 \
+--link flask1:flask1 \
+--link flask2:flask2 \
+--link flask3:flask3 \
+--link flask4:flask4 \
+--link flask5:flask5 \
+--link flask6:flask6 \
+--link flask7:flask7 my-nginx;
+
