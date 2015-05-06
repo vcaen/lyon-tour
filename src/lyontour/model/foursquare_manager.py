@@ -107,21 +107,21 @@ class FoursquareManager:
                     attraction = Attraction()
                     # Basics
                     attraction.foursquare_id = venue_id
-                    attraction.name = item['venue']['name'].encode('utf8')
+                    attraction.name = item['venue']['name']
 
                     if self.get_categories(section, item['venue']) is True:
                         if 'description' in item['venue']:
-                            attraction.description = item['venue']['description'].decode('utf8')
+                            attraction.description = item['venue']['description']
                         elif 'tips' in item:
                             for tip in item['tips']:
                                 if "le" in tip['text']:
-                                    attraction.description = tip['text'].decode('utf8')
+                                    attraction.description = tip['text']
                                     break
 
                         # Location
                         if 'location' in item['venue'] :
                             if 'address' in item['venue']['location']:
-                                attraction.address = item['venue']['location']['address'].decode('utf8')
+                                attraction.address = item['venue']['location']['address']
                             if 'lat' in item['venue']['location']:
                                 attraction.latitude = item['venue']['location']['lat']
                             if 'lng' in item['venue']['location']:
