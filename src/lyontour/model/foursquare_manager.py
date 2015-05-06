@@ -126,7 +126,7 @@ class FoursquareManager:
                                 attraction.latitude = item['venue']['location']['lat']
                             if 'lng' in item['venue']['location']:
                                 attraction.longitude = item['venue']['location']['lng']
-                            if 'postalCode' in item['venue']['location']:
+                            if 'postalCode' in item['venue']['location'] and item['venue']['location'] is int:
                                 attraction.postcode = item['venue']['location']['postalCode']
                             if 'city' in item['venue']['location']:
                                 attraction.ville = item['venue']['location']['city']
