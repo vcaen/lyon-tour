@@ -8,14 +8,15 @@ import datetime
 import json
 from lyontour.model.models import Section
 
-def calculDistance(a,list, filtre = None):
+def calculDistance(a,list, filtre = None, cafe=False):
     resto = list[0]
     distMin = 100000
     for r in list:
         temp = pow(float(a.latitude) - float(r.latitude),2)+pow(float(a.longitude) - float(r.longitude),2)
         if (temp < distMin and r.section.name in filtre):
-            distMin=temp
-            resto = r
+            if (cafe==False) or (cafe==True and r.section.name!='coffee'):
+                distMin=temp
+                resto = r
     return resto
 
 class Tour:
@@ -53,6 +54,7 @@ class Tour:
         for jour in self.Jours:
             midi = False
             soir = False
+            cafe = False
 
             currentH = 8
 
@@ -67,6 +69,8 @@ class Tour:
                     day.remove(currentA)
                     jour.etapes.append(Etape(currentH, currentA))
                     currentH = currentH +  currentA.section.duration
+                    if(currentA.section.name == "coffee"):
+                        cafe=True
                 elif currentH >=13 and midi == False:
                     if currentH > 13:
                         currentH = 13
@@ -74,6 +78,7 @@ class Tour:
                     eat.remove(currentA)
                     jour.etapes.append(Etape(currentH, currentA))
                     midi = True
+                    cafe=False
                     currentH = currentH + currentA.section.duration
                 elif currentH >=21 and soir == False:
                     if currentH > 21:
@@ -84,10 +89,12 @@ class Tour:
                     soir = True
                     currentH = currentH +  currentA.section.duration
                 elif (currentH >8 and currentH <12) and len(day)!=0 :
-                    currentA = calculDistance(currentA, day, jour.filtres)
+                    currentA = calculDistance(currentA, day, jour.filtres,cafe)
                     day.remove(currentA)
                     jour.etapes.append(Etape(currentH, currentA))
                     currentH = currentH +  currentA.section.duration
+                    if(currentA.section.name == "coffee"):
+                        cafe=True
                 elif (currentH >=11 and currentH <14) and midi ==False :
                     if currentH < 12:
                         currentH = 12
@@ -95,6 +102,7 @@ class Tour:
                     eat.remove(currentA)
                     jour.etapes.append(Etape(currentH, currentA))
                     midi = True
+                    cafe=False
                     currentH = currentH + 2
                 elif (currentH >=19 and currentH <21) and len(eat)!=0 and soir == False :
                     currentA = calculDistance(currentA, eat, ['food'])
@@ -103,12 +111,14 @@ class Tour:
                     soir = True
                     currentH = currentH +  currentA.section.duration
                 elif (currentH >=13 and currentH <20) and len(day)!=0 :
-                    currentA = calculDistance(currentA, day, jour.filtres)
+                    currentA = calculDistance(currentA, day, jour.filtres,cafe)
                     day.remove(currentA)
                     jour.etapes.append(Etape(currentH, currentA))
                     currentH = currentH +  currentA.section.duration
+                    if(currentA.section.name == "coffee"):
+                        cafe=True
                 elif (currentH >=20 and currentH <23) and len(evnight)!=0:
-                    currentA = calculDistance(currentA, evnight, jour.filtres)
+                    currentA = calculDistance(currentA, evnight, jour.filtres,cafe)
                     evnight.remove(currentA)
                     jour.etapes.append(Etape(currentH, currentA))
                     currentH = currentH +  currentA.section.duration
@@ -133,12 +143,16 @@ class Jour:
         self.date = date
         self.etapes=[]
         f_manager = filter_manager([date])
-        weather = f_manager.getWeatherByDay(str(self.date))
-        self.weather_temp = weather["temp"]
-        if weather["pluie"] is True:
-            self.weather_status = "rainy"
+        if date.date()<(datetime.datetime.today()+datetime.timedelta(days=7)).date():
+            weather = f_manager.getWeatherByDay(str(self.date))
+            self.weather_temp = weather["temp"]
+            if weather["pluie"] is True:
+                self.weather_status = "rainy"
+            else:
+                self.weather_status = weather["nuage"]
         else:
-            self.weather_status = weather["nuage"]
+            self.weather_status = "none"
+            self.weather_temp = "none"
 
         self.filtres = f_manager.filtre_meteo(str(self.date), filtres)
 
