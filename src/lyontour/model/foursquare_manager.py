@@ -19,10 +19,12 @@ requests_cache.install_cache(expire_after=3600)
 
 client_id = 'LMF4BB0X4XLOO4QGB02QU3XH20Z0HR5ZFCPHLR4KPJR4VTC0'
 client_secret = 'L3JAOZNUQ0MIIDWIP5OI44CEJCOIDMCVO22VCQHPTKOTTUQ3'
-version = '20130815'
+version = '20150605'
 near = 'Lyon'
 url = 'https://api.foursquare.com/v2/venues/explore?'
 params= {'client_id': client_id, 'client_secret': client_secret, 'near': near, 'v': version}
+
+session = requests.session()
 
 
 class FoursquareManager:
@@ -35,7 +37,7 @@ class FoursquareManager:
         Retreive and save if not exist a photo for the given venue
     """
     def first_photo_for_venue(self, venue_id):
-        r = requests.get(self.VENUES + '/' + venue_id, params=params)
+        r = session.get(self.VENUES + '/' + venue_id, params=params)
         if(r.status_code != requests.codes.ok) :
 
             return None
@@ -46,7 +48,7 @@ class FoursquareManager:
             photoUrl.replace('\\', '')
             photoName = config.PHOTO_DIR_PATH+ "/" + venue_id + self.PHOTO_EXT
             if not os.path.exists(photoName) :
-                r = requests.get(photoUrl, stream=True)
+                r = session.get(photoUrl, stream=True)
                 if r.status_code == 200:
                     with open(photoName, 'wb') as f:
                         for chunk in r.iter_content(chunk_size=1024):
@@ -94,8 +96,8 @@ class FoursquareManager:
 
             #for section in listSection:
             params['section'] = section
-            response = requests.get(url, params=params)
-            # print response.url
+            response = session.get(url, params=params)
+            print "CODE" + str(response.status_code)
             data = json.loads(response.text)
             for val in data["response"]["groups"]:
                 for item in val['items']:
