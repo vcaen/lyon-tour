@@ -16,94 +16,69 @@ meteo_api_url = "http://www.infoclimat.fr/public-api/gfs/json?_ll=45.74846,4.846
 
 
 class filter_manager:
+    #attribut: liste des sections filtrées par la météo(string)
+    filtred_section = []
 
-    def __init__(self, liste_jours=None, preferences_user=None):
-        self.filtred_attractions = self.getAttractionFiltred(liste_jours, preferences_user)
+    #constructeur: à partir d'une liste de jour et des préférences utilisateurs pour les sections
+    def __init__(self, liste_jours, preferences_user=None):
+        sections = []
+        if not(preferences_user is None):
+            for jour in liste_jours:
+                sections[jour] = self.filtre_meteo(jour, preferences_user)
+        self.filtred_section = sections
 
+
+    #return un dictionnaire avec les clés suivantes: date(string formatée: Y-M-D), temp(en Celcius), nuage(bool), pluie(bool) et nuage(string: cloudy, partly cloudy, sunny)
+    #param objet de type date
     def getWeatherByDay(self, jour):
-        date_jour = datetime.datetime.strptime(jour, '%Y%m%d').date()
-        date_formatee = date_jour.year + "-" + date_jour.month + "-" + date_jour.day
-        # to_day = datetime.datetime.now().date()
-        # if date_jour < to_day:
-        #     return "erreur, date passée \n"
-        #else:
-            #rain = WeatherDay.query.filter_by(date=jour).first().rain
-        day = WeatherDay.query.get(jour)
+        #on formate la date en string Y-M-D compatible avec le contenu du json de l'API
+        date_formatee = datetime.datetime.strptime(jour, '%Y-%m-%d %H:%M:%S').date()
+        print(date_formatee)
+        #on recherche d'abord dans la table weather_day si la requête pour le jour a déjà été faite et stockée
+        day = WeatherDay.query.get(date_formatee)
         weather_day = {}
-        weather_day["date"] = date_jour
+        weather_day["date"] = date_formatee
         if not(day is None):
+            #on remplit le dictionnaire renvoyé
             weather_day["temp"] = day.temp
             weather_day["nuage"] = day.cloud
-            weather_day["pluie"] = day.rain <= 2
+            weather_day["pluie"] = day.rain
             weather_day["neige"] = day.snow
             return weather_day
         else:
+            #sinon on requête API
             f = urllib2.urlopen(meteo_api_url)
             json_string = f.read()
             parsed_json = json.loads(json_string)
             f.close()
-            weather_day["temp"] = parsed_json[date_formatee + ' 12:00:00']["temperature"]["sol"] - 273,15
-            weather_day["pluie"] = parsed_json[date_formatee + ' 12:00:00']["pluie"]
-            if parsed_json[jour + ' 12:00:00']["nebulosite"]["totale"] < 10:
+            #on remplit le dictionnaire renvoyé
+            weather_day["temp"] = (parsed_json[str(date_formatee) + ' 12:00:00']["temperature"]["sol"]) - 273.15
+            weather_day["pluie"] = parsed_json[str(date_formatee) + ' 12:00:00']["pluie"] >=2
+            if parsed_json[str(date_formatee) + ' 12:00:00']["nebulosite"]["totale"] < 10:
                 weather_day["nuage"] = "sunny"
             elif parsed_json[date_formatee + ' 12:00:00']["nebulosite"]["totale"] >= 10 and parsed_json[date_formatee + ' 12:00:00']["nebulosite"]["totale"] < 50:
                 weather_day["nuage"] = "partly cloudy"
             else:
                 weather_day["nuage"] = "partly cloudy"
-            weather_day["neige"] = parsed_json[date_formatee + ' 12:00:00']["snow"] == "oui"
-            weather_day["pluie"] = day.rain >= 2
-            weather_day["snow"] = day.snow
-            day = WeatherDay(date_jour, weather_day["temp"], weather_day["nuage"], weather_day["pluie"], weather_day["snow"])
+            weather_day["neige"] = parsed_json[str(date_formatee) + ' 12:00:00']["risque_neige"] == "oui"
+            #on construit l'objet et on le rentre dans la DB
+            print "Filling WeatherDay table .."
+            day = WeatherDay(str(date_formatee), weather_day["temp"], weather_day["nuage"], weather_day["pluie"], weather_day["neige"])
             db.session.add(day)
             db.session.commit()
+            print "WeatherDay table Filled "
             return weather_day
 
-
-    # on ne s'en sert plus !
-    def getRainByDay(self, jour):
-        date_jour = datetime.datetime.strptime(jour, '%Y-%m-%d').date()
-        # to_day = datetime.datetime.now().date()
-        # if date_jour < to_day:
-        #     return "erreur, date passée \n"
-        # else:
-            #snow = WeatherDay.query.filter_by(date=jour).first().snow
-        day = WeatherDay.query.get(jour)
-        if not(day is None):
-            pluie = day.rain
-            return pluie<=2.5
-        else:
-            f = urllib2.urlopen(meteo_api_url)
-            json_string = f.read()
-            parsed_json = json.loads(json_string)
-            f.close()
-            pluie = parsed_json[jour + ' 12:00:00']["rain"]
-            return pluie
-
-    # on ne s'en sert plus !
-    def getSnowByDay(self, jour):
-        date_jour = datetime.datetime.strptime(jour, '%Y-%m-%d').date()
-        # to_day = datetime.datetime.now().date()
-        # if date_jour < to_day:
-        #     return "erreur, date passée \n"
-        # else:
-            #snow = WeatherDay.query.filter_by(date=jour).first().snow
-        day = WeatherDay.query.get(jour)
-        if not(day is None):
-            neige = day.snow
-            return neige
-        else:
-            f = urllib2.urlopen(meteo_api_url)
-            json_string = f.read()
-            parsed_json = json.loads(json_string)
-            f.close()
-            snow = parsed_json[jour + ' 12:00:00']["risque_neige"]
-            return snow
-
+    #@return une liste des sections filtées par la météo pour chaque jour à partir des préférences utilisateurs
+    #params liste d'objets de type Date, liste des préférences de sections utilisateur(string)
     def filtre_meteo(self, jour, preference):
+        user = preference
         for i in preference:
             section = Section.query.filter_by(name=i).first()
             if not(section is None):
                     if (section.weather == "bad" and (self.getWeatherByDay(jour)["pluie"] is False or self.getWeatherByDay(jour)["neige"] is False)) or (section.weather == "good" and (self.getWeatherByDay(jour)["pluie"] is True or self.getWeatherByDay(jour)["neige"] is True or self.getWeatherByDay(jour)["nuage"] == "cloudy" or self.getWeatherByDay(jour)["nuage"] == "partly cloudy")):
                         preference.remove(i)
-        return preference
-
+        if (not preference):
+            return user
+        else:
+            return preference

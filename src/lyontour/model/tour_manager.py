@@ -1,7 +1,6 @@
 from sqlalchemy import Enum
 from models import Attraction, Section
 from foursquare_manager import executeRequests1
-from lyontour import db
 from foursquare_manager import executeRequests
 from filter_manager import filter_manager
 
@@ -130,7 +129,10 @@ class Tour:
                     currentH = currentH + 1
 
     def getJours(self):
-        return self.Jours
+        liste_jour = []
+        for jour in self.Jours:
+            liste_jour.append(jour.getDate())
+        return liste_jour
 
 
 class Itineraire:
@@ -140,11 +142,16 @@ class Itineraire:
 class Jour:
     def __init__(self, date, filtres):
         self.date = date
+        f_manager = filter_manager([date])
+        weather = f_manager.getWeatherByDay(str(self.date))
+        self.weather_temp = weather["temp"]
+        if weather["pluie"] is True:
+            self.weather_status = "rainy"
+        else:
+            self.weather_status = weather["nuage"]
         self.etapes=[]
         self.filtres = filtres
 
-    def getWeatherStatus(self):
-        return self.weather_status
 
 class Etape:
     def __init__(self, Heure, Attraction):

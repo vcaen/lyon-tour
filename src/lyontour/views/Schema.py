@@ -31,6 +31,8 @@ class EtapeSchema(Schema):
 class JourSchema(Schema):
     date = fields.DateTime("%d%m%Y")
     etapes = fields.List(fields.Nested(EtapeSchema))
+    weather_status = fields.Str()
+    weather_temp = fields.Str()
 
 class SectionSchema(ModelSchema):
     class Meta:
@@ -52,7 +54,7 @@ class TourSchema(Schema):
     #     fields = ('DateDebut', 'DateFin', 'PI')
 
 class FilterSchema(Schema):
-    filtred_attractions = fields.List(fields.Str())
+    filtred_section = fields.List(fields.Str())
 
 attraction_schema = AttractionSchema()
 section_schema = SectionSchema()
