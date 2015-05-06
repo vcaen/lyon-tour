@@ -1,4 +1,5 @@
 #!/bin/bash
+docker rmi $(docker images -qf dangling=true)
 
 docker pull vcaen/lyon-tour-flask;
 docker pull vcaen/lyon-tour-mysql;
