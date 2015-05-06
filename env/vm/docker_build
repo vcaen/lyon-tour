@@ -2,4 +2,4 @@
 
 docker pull vcaen/lyon-tour-flask;
 docker pull vcaen/lyon-tour-mysql;
-docker build -t nginx /app/env/nginx
+docker build -t my-nginx /home/h4312/env/nginx
