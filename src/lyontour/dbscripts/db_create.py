@@ -23,8 +23,8 @@ def populate_sections():
         Section("coffee", "whatever", "day", 1),
         Section("shops", "bad", "day", 1),
         Section("arts", "bad", "day", 3),
-        Section("outdoors", "good", "day/evening", 2),
-        Section("sights", "good", "day/evening", 2),
+        Section("outdoors", "good", "day", 3),
+        Section("sights", "good", "day", 2),
         Section("topPicks", "good", "day", 3)
     ]
     db.session.add_all(sections)
