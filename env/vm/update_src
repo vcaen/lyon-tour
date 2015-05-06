@@ -1,0 +1,1 @@
+pushd /home/h4312/lyon-tour && git fetch && git checkout -f server && git reset --hard origin/server && cp -r ./src/* /home/h4312/app && popd;
