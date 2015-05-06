@@ -1,0 +1,15 @@
+if [ `docker ps -aq | wc -l` -gt 0 ]; then
+	echo "Cleaning Docker's containers"
+	docker kill $(sudo docker ps -aq);
+	docker rm -f $(sudo docker ps -aq);
+fi
+docker run --name lyon-tour-database -v /home/h4312/database:/var/lib/mysql -d -p 3306:3306 vcaen/lyon-tour-mysql && \
+docker run -v /home/h4312/app:/app --restart=on-failure -d -p 8080:8000 --link lyon-tour-database:webdb vcaen/lyon-tour-flask;
+docker run -v /home/h4312/app:/app --restart=on-failure -d -p 8081:8000 --link lyon-tour-database:webdb vcaen/lyon-tour-flask;
+docker run -v /home/h4312/app:/app --restart=on-failure -d -p 8082:8000 --link lyon-tour-database:webdb vcaen/lyon-tour-flask;
+docker run -v /home/h4312/app:/app --restart=on-failure -d -p 8083:8000 --link lyon-tour-database:webdb vcaen/lyon-tour-flask;
+docker run -v /home/h4312/app:/app --restart=on-failure -d -p 8084:8000 --link lyon-tour-database:webdb vcaen/lyon-tour-flask;
+docker run -v /home/h4312/app:/app --restart=on-failure -d -p 8085:8000 --link lyon-tour-database:webdb vcaen/lyon-tour-flask;
+docker run -v /home/h4312/app:/app --restart=on-failure -d -p 8086:8000 --link lyon-tour-database:webdb vcaen/lyon-tour-flask;
+docker run -v /home/h4312/app:/app --restart=on-failure -d -p 8087:8000 --link lyon-tour-database:webdb vcaen/lyon-tour-flask;
+docker run --name nginx -d -p 80:80 my-nginx 
