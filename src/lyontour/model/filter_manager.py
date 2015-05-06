@@ -20,11 +20,10 @@ class filter_manager:
     filtred_section = []
 
     #constructeur: à partir d'une liste de jour et des préférences utilisateurs pour les sections
-    def __init__(self, liste_jours, preferences_user=None):
+    def __init__(self, jour, preferences_user=None):
         sections = []
         if not(preferences_user is None):
-            for jour in liste_jours:
-                sections[jour] = self.filtre_meteo(jour, preferences_user)
+                sections = self.filtre_meteo(jour, preferences_user)
         self.filtred_section = sections
 
 
@@ -51,15 +50,15 @@ class filter_manager:
             parsed_json = json.loads(json_string)
             f.close()
             #on remplit le dictionnaire renvoyé
-            weather_day["temp"] = (parsed_json[date_formatee + ' 12:00:00']["temperature"]["sol"]) - 273.15
-            weather_day["pluie"] = parsed_json[date_formatee + ' 12:00:00']["pluie"] >=2
-            if parsed_json[date_formatee + ' 12:00:00']["nebulosite"]["totale"] < 10:
+            weather_day["temp"] = (parsed_json[str(date_formatee) + ' 12:00:00']["temperature"]["sol"]) - 273.15
+            weather_day["pluie"] = parsed_json[str(date_formatee) + ' 12:00:00']["pluie"] >=2
+            if parsed_json[str(date_formatee) + ' 12:00:00']["nebulosite"]["totale"] < 10:
                 weather_day["nuage"] = "sunny"
-            elif parsed_json[date_formatee + ' 12:00:00']["nebulosite"]["totale"] >= 10 and parsed_json[date_formatee + ' 12:00:00']["nebulosite"]["totale"] < 50:
+            elif parsed_json[str(date_formatee) + ' 12:00:00']["nebulosite"]["totale"] >= 10 and parsed_json[str(date_formatee) + ' 12:00:00']["nebulosite"]["totale"] < 50:
                 weather_day["nuage"] = "partly cloudy"
             else:
                 weather_day["nuage"] = "partly cloudy"
-            weather_day["neige"] = parsed_json[date_formatee + ' 12:00:00']["risque_neige"] == "oui"
+            weather_day["neige"] = parsed_json[str(date_formatee) + ' 12:00:00']["risque_neige"] == "oui"
             #on construit l'objet et on le rentre dans la DB
             print "Filling WeatherDay table .."
             day = WeatherDay(date_formatee, weather_day["temp"], weather_day["nuage"], weather_day["pluie"], weather_day["neige"])
