@@ -140,7 +140,7 @@ class Jour:
         else:
             self.weather_status = weather["nuage"]
 
-        self.filtres = f_manager.filtre_meteo(self.date, filtres)
+        self.filtres = f_manager.filtre_meteo(str(self.date), filtres)
 
 
 class Etape:

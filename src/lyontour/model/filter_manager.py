@@ -65,7 +65,7 @@ class filter_manager:
             db.session.add(day)
             db.session.commit()
             print "WeatherDay table Filled "
-            return weather_day
+        return weather_day
 
     #@return une liste des sections filtées par la météo pour chaque jour à partir des préférences utilisateurs
     #params liste d'objets de type Date, liste des préférences de sections utilisateur(string)
