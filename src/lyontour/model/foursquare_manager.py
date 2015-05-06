@@ -37,7 +37,7 @@ class FoursquareManager:
     def first_photo_for_venue(self, venue_id):
         r = requests.get(self.VENUES + '/' + venue_id, params=params)
         if(r.status_code != requests.codes.ok) :
-            print "Photo Request Error " + str(r.status_code)
+
             return None
         photos = r.json()['response']['venue']['photos']
         if photos['count'] > 0 :
@@ -64,7 +64,7 @@ class FoursquareManager:
             if 'categories' in venue:
                 for cat in venue['categories']:
                     if "French Restaurant" in cat['name']:
-                        print venue['name']
+
                         return True
                     else:
                         return False
@@ -163,10 +163,6 @@ def executeRequests(limit, listSection=None):
                 listAttractionSection.add(attraction)
         listAttraction.append(listAttractionSection)
     db.session.commit()
-    for section in listAttraction:
-        print '   '
-        for attraction in section:
-            print attraction.name
     return listAttraction
 
 def executeRequests1(limit, listSection=None):

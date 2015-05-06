@@ -32,7 +32,6 @@ class filter_manager:
     def getWeatherByDay(self, jour):
         #on formate la date en string Y-M-D compatible avec le contenu du json de l'API
         date_formatee = datetime.datetime.strptime(jour, '%Y-%m-%d %H:%M:%S').date()
-        print(date_formatee)
         #on recherche d'abord dans la table weather_day si la requête pour le jour a déjà été faite et stockée
         day = WeatherDay.query.get(date_formatee)
         weather_day = {}
