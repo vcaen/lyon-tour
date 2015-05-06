@@ -28,14 +28,17 @@ class Tour:
         self.nbJour = (self.DateFin - self.DateDebut).days + 1
         self.Jours = []
         self.Filtre = str(list).split(',')
-        self.attractions = executeRequests1(int(10*self.nbJour/len(self.Filtre)), self.Filtre)
+        if len(self.Filtre)>0:
+            nombreRequest = int(10*self.nbJour/len(self.Filtre))
+        else:
+            nombreRequest = 1
+        self.attractions = executeRequests1(nombreRequest, self.Filtre)
         for i in range(0,self.nbJour,1):
             self.Jours.append(Jour((self.DateDebut + datetime.timedelta(days = i)), self.Filtre))
         self.doItineraire()
 
     def doItineraire(self):
         night = []
-        eat = []
         day = []
         evnight = []
         dayev = []
@@ -60,12 +63,18 @@ class Tour:
 
             while currentH<23:
                 if currentH == 8 :
-                    print(len(day))
-                    for att in day:
-                        if att.section.name in jour.filtres :
-                            currentA = att
-                            day.remove(att)
-                            break
+                    if len(day) != 0:
+                        for att in day:
+                            if att.section.name in jour.filtres :
+                                currentA = att
+                                day.remove(att)
+                                break
+                    elif len(dayev)!=0:
+                        for att in dayev:
+                            if att.section.name in jour.filtres :
+                                currentA = att
+                                dayev.remove(att)
+                                break
                     jour.etapes.append(Etape(currentH, currentA))
                     currentH = currentH +  currentA.section.duration
                 elif currentH >=13 and midi == False:
@@ -133,7 +142,6 @@ class Itineraire:
 class Jour:
     def __init__(self, date, filtres):
         self.date = date
-        self.attractions = []
         f_manager = filter_manager([date])
         weather = f_manager.getWeatherByDay(str(self.date))
         self.weather_temp = weather["temp"]
@@ -144,14 +152,8 @@ class Jour:
         self.etapes=[]
         self.filtres = filtres
 
-    #renvoie pour l'instance jour un string(rainy, cloudy, partly cloudy, sunny)
-    def getWeatherStatus(self):
-        return self.weather_status
 
 class Etape:
     def __init__(self, Heure, Attraction):
         self.heure = Heure
         self.attraction = Attraction
-
-    def getDate(self):
-        return self.date
