@@ -71,12 +71,15 @@ class filter_manager:
     #params liste d'objets de type Date, liste des préférences de sections utilisateur(string)
     def filtre_meteo(self, jour, preference):
         user = preference
-        for i in preference:
-            section = Section.query.filter_by(name=i).first()
-            if not(section is None):
-                    if (section.weather == "bad" and (self.getWeatherByDay(jour)["pluie"] is False or self.getWeatherByDay(jour)["neige"] is False)) or (section.weather == "good" and (self.getWeatherByDay(jour)["pluie"] is True or self.getWeatherByDay(jour)["neige"] is True or self.getWeatherByDay(jour)["nuage"] == "cloudy" or self.getWeatherByDay(jour)["nuage"] == "partly cloudy")):
-                        preference.remove(i)
-        if (not preference):
-            return user
+        if datetime.datetime.strptime(jour, '%Y-%m-%d %H:%M:%S').date()<(datetime.datetime.today()+datetime.timedelta(days=7)).date():
+            for i in preference:
+                section = Section.query.filter_by(name=i).first()
+                if not(section is None):
+                        if (section.weather == "bad" and (self.getWeatherByDay(jour)["pluie"] is False or self.getWeatherByDay(jour)["neige"] is False)):
+                            preference.remove(i)
+            if (not preference):
+                return user
+            else:
+                return preference
         else:
             return preference

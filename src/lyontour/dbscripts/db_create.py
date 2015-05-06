@@ -24,8 +24,7 @@ def populate_sections():
         Section("shops", "bad", "day", 1),
         Section("arts", "bad", "day", 3),
         Section("outdoors", "good", "day", 3),
-        Section("sights", "good", "day", 2),
-        Section("topPicks", "good", "day", 3)
+        Section("sights", "good", "day", 2)
     ]
     db.session.add_all(sections)
     db.session.commit();
