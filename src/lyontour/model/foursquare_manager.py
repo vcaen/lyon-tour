@@ -17,9 +17,9 @@ requests_cache.install_cache(expire_after=3600)
 
 #from models import Type
 
-client_id = 'LMF4BB0X4XLOO4QGB02QU3XH20Z0HR5ZFCPHLR4KPJR4VTC0'
-client_secret = 'L3JAOZNUQ0MIIDWIP5OI44CEJCOIDMCVO22VCQHPTKOTTUQ3'
-version = '20150605'
+client_id = 'KLSKVBRRASCKSHA54GH1FFQ0CCJWO4V5ARYDZWMLLJHFOJWT'
+client_secret = '0PV3KLUBI1RBHG3EVDLW5LTMXA53SD2GFPJ4VNTR2UW4RRPY'
+version = '20130815'
 near = 'Lyon'
 url = 'https://api.foursquare.com/v2/venues/explore?'
 params= {'client_id': client_id, 'client_secret': client_secret, 'near': near, 'v': version}
@@ -66,7 +66,6 @@ class FoursquareManager:
             if 'categories' in venue:
                 for cat in venue['categories']:
                     if "French Restaurant" in cat['name']:
-
                         return True
                     else:
                         return False
@@ -86,23 +85,24 @@ class FoursquareManager:
         loop = 0
         listAttraction = set()
         currentLimit = limit
-        while(countAttraction<limit):
+        while(countAttraction < limit):
             loop=loop+1
-            if loop > 1:
+            if (loop > 1 and loop <= 10):
                 currentLimit = currentLimit+10
                 params['limit'] = currentLimit
-            else:
+            elif loop==1:
                 params['limit'] = currentLimit
+            elif loop > 5:
+                break
 
             #for section in listSection:
             params['section'] = section
             response = session.get(url, params=params)
-            print "CODE" + str(response.status_code)
             data = json.loads(response.text)
             for val in data["response"]["groups"]:
                 for item in val['items']:
                     venue_id = item['venue']['id']
-                    if db.session.query(Attraction).filter_by(foursquare_id=venue_id).first():
+                    if db.session.query(Attraction).filter_by(foursquare_id=venue_id).first() is not None:
                         if not self.has_local_photo_for_venue(venue_id):
                             self.first_photo_for_venue(venue_id)
                         continue
@@ -111,7 +111,7 @@ class FoursquareManager:
                     attraction.foursquare_id = venue_id
                     attraction.name = item['venue']['name']
 
-                    if self.get_categories(section, item['venue']) is True:
+                    if self.get_categories(section, item['venue']) is True and "Carrefour Drive" not in attraction.name:
                         if 'description' in item['venue']:
                             attraction.description = item['venue']['description']
                         elif 'tips' in item:
@@ -142,32 +142,14 @@ class FoursquareManager:
 
                         attraction.photo = self.first_photo_for_venue(attraction.foursquare_id)
                         listAttraction.add(attraction)
-                        countAttraction = countAttraction+1
+
                         db.session.add(attraction)
+                        countAttraction = countAttraction+1
+
         return listAttraction
 
 
 def executeRequests(limit, listSection=None):
-    listAttraction = []
-    if listSection is None:
-        resp = Section.query.all()
-        listSection = [ x.name for x in resp ]
-
-    for section in listSection:
-        listAttractionSection = set()
-        attractions_count = 0
-        for attraction in Attraction.query.join(Section).filter(Section.name==section).limit(limit):
-            listAttractionSection.add(attraction)
-            attractions_count = attractions_count+1
-        if attractions_count < limit :
-            foursquare_manager = FoursquareManager()
-            for attraction in foursquare_manager.get_venues(limit, section):
-                listAttractionSection.add(attraction)
-        listAttraction.append(listAttractionSection)
-    db.session.commit()
-    return listAttraction
-
-def executeRequests1(limit, listSection=None):
     listAttraction = []
     if listSection is None:
         resp = Section.query.all()
@@ -183,17 +165,13 @@ def executeRequests1(limit, listSection=None):
             for attraction in foursquare_manager.get_venues(limit, section):
                 listAttraction.append(attraction)
     db.session.commit()
-    # for section in listAttraction:
-    #     print '   '
-    #     for attraction in section:
-    #         print attraction.name
     return listAttraction
 
 
-if __name__=='__main__':
-    listSection = []
-    listSection.append('food')
+#if __name__=='__main__':
+    #listSection = []
+    #listSection.append('food')
     #listSection.append('drinks')
-    executeRequests(20, listSection)#, listSection)
+    #executeRequests(20, listSection)#, listSection)
 
 

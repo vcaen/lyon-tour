@@ -1,6 +1,4 @@
-from sqlalchemy import Enum
-from models import Attraction, Section
-from foursquare_manager import executeRequests1
+
 from foursquare_manager import executeRequests
 from filter_manager import filter_manager
 
@@ -15,7 +13,7 @@ def calculDistance(a,list, filtre = None):
     distMin = 100000
     for r in list:
         temp = pow(float(a.latitude) - float(r.latitude),2)+pow(float(a.longitude) - float(r.longitude),2)
-        if temp < distMin and r.section.name in filtre:
+        if (temp < distMin and r.section.name in filtre):
             distMin=temp
             resto = r
     return resto
@@ -29,10 +27,10 @@ class Tour:
         self.Jours = []
         self.Filtre = str(list).split(',')
         if len(self.Filtre)>0:
-            nombreRequest = int(10*self.nbJour/len(self.Filtre))
+            nombreRequest = int(10*self.nbJour/len(self.Filtre))+1
         else:
             nombreRequest = 1
-        self.attractions = executeRequests1(nombreRequest, self.Filtre)
+        self.attractions = executeRequests(nombreRequest, self.Filtre)
         for i in range(0,self.nbJour,1):
             self.Jours.append(Jour((self.DateDebut + datetime.timedelta(days = i)), self.Filtre))
         self.doItineraire()
@@ -41,8 +39,7 @@ class Tour:
         night = []
         day = []
         evnight = []
-        dayev = []
-        eat = executeRequests1(26, [str('food')])
+        eat = executeRequests(26, [str('food')])
 
         for a in self.attractions:
             s = a.section.dayTime
@@ -52,8 +49,6 @@ class Tour:
                 day.append(a)
             elif s == "evening/night":
                 evnight.append(a)
-            elif s == "day/evening":
-                dayev.append(a)
 
         for jour in self.Jours:
             midi = False
@@ -64,23 +59,19 @@ class Tour:
             while currentH<23:
                 if currentH == 8 :
                     if len(day) != 0:
+                        currentA = day[0]
                         for att in day:
                             if att.section.name in jour.filtres :
                                 currentA = att
-                                day.remove(att)
                                 break
-                    elif len(dayev)!=0:
-                        for att in dayev:
-                            if att.section.name in jour.filtres :
-                                currentA = att
-                                dayev.remove(att)
-                                break
+                    day.remove(currentA)
                     jour.etapes.append(Etape(currentH, currentA))
                     currentH = currentH +  currentA.section.duration
                 elif currentH >=13 and midi == False:
                     if currentH > 13:
                         currentH = 13
                     currentA = calculDistance(currentA, eat, ['food'])
+                    eat.remove(currentA)
                     jour.etapes.append(Etape(currentH, currentA))
                     midi = True
                     currentH = currentH + currentA.section.duration
@@ -88,6 +79,7 @@ class Tour:
                     if currentH > 21:
                         currentH = 21
                     currentA = calculDistance(currentA, eat, ['food'])
+                    eat.remove(currentA)
                     jour.etapes.append(Etape(currentH, currentA))
                     soir = True
                     currentH = currentH +  currentA.section.duration
@@ -100,22 +92,19 @@ class Tour:
                     if currentH < 12:
                         currentH = 12
                     currentA = calculDistance(currentA, eat, ['food'])
+                    eat.remove(currentA)
                     jour.etapes.append(Etape(currentH, currentA))
                     midi = True
                     currentH = currentH + 2
                 elif (currentH >=19 and currentH <21) and len(eat)!=0 and soir == False :
                     currentA = calculDistance(currentA, eat, ['food'])
+                    eat.remove(currentA)
                     jour.etapes.append(Etape(currentH, currentA))
                     soir = True
                     currentH = currentH +  currentA.section.duration
                 elif (currentH >=13 and currentH <20) and len(day)!=0 :
                     currentA = calculDistance(currentA, day, jour.filtres)
                     day.remove(currentA)
-                    jour.etapes.append(Etape(currentH, currentA))
-                    currentH = currentH +  currentA.section.duration
-                elif (currentH >=13 and currentH <20) and len(dayev)!=0:
-                    currentA = calculDistance(currentA, dayev, jour.filtres)
-                    dayev.remove(currentA)
                     jour.etapes.append(Etape(currentH, currentA))
                     currentH = currentH +  currentA.section.duration
                 elif (currentH >=20 and currentH <23) and len(evnight)!=0:
@@ -142,6 +131,7 @@ class Itineraire:
 class Jour:
     def __init__(self, date, filtres):
         self.date = date
+        self.etapes=[]
         f_manager = filter_manager([date])
         weather = f_manager.getWeatherByDay(str(self.date))
         self.weather_temp = weather["temp"]
@@ -149,8 +139,8 @@ class Jour:
             self.weather_status = "rainy"
         else:
             self.weather_status = weather["nuage"]
-        self.etapes=[]
-        self.filtres = filtres
+
+        self.filtres = f_manager.filtre_meteo(str(self.date), filtres)
 
 
 class Etape:

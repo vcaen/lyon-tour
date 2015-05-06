@@ -31,7 +31,7 @@ class filter_manager:
     #param objet de type date
     def getWeatherByDay(self, jour):
         #on formate la date en string Y-M-D compatible avec le contenu du json de l'API
-        date_formatee = datetime.datetime.strptime(jour, '%Y-%m-%d %H:%M:%S').date()
+        date_formatee = datetime.datetime.strptime(str(jour), '%Y-%m-%d %H:%M:%S').date()
         #on recherche d'abord dans la table weather_day si la requête pour le jour a déjà été faite et stockée
         day = WeatherDay.query.get(date_formatee)
         weather_day = {}
@@ -65,7 +65,7 @@ class filter_manager:
             db.session.add(day)
             db.session.commit()
             print "WeatherDay table Filled "
-            return weather_day
+        return weather_day
 
     #@return une liste des sections filtées par la météo pour chaque jour à partir des préférences utilisateurs
     #params liste d'objets de type Date, liste des préférences de sections utilisateur(string)
