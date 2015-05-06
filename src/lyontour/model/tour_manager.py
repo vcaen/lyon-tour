@@ -1,3 +1,4 @@
+# coding: utf8
 from sqlalchemy import Enum
 from models import Attraction, Section
 from foursquare_manager import executeRequests1
